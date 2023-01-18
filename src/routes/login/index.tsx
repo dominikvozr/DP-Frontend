@@ -1,8 +1,29 @@
-import { component$ } from "@builder.io/qwik"
-import { DocumentHead } from '@builder.io/qwik-city';
-import { AuthApi } from "~/db/AuhtApi";
+import { component$, useClientEffect$ } from "@builder.io/qwik"
+import { DocumentHead, RequestHandler, useLocation } from '@builder.io/qwik-city';
+import { baseUrl } from "~/db/url";
+import { UserApi } from "~/db/UserApi";
+import { User } from "~/models/User";
+
+export const onGet: RequestHandler<User> = async ({ request, response }) => {
+	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
+	if (isAuthorized) {
+		throw response.redirect('/')
+	}
+  return user
+};
 
 export default component$(() => {
+  const loc = useLocation()
+
+  useClientEffect$( () => {
+    if (loc.query.test && loc.query.test != "null") {
+			if (loc.query.test.includes('/')) {
+				localStorage.setItem('test', loc.query.test.split('/')[0])
+			} else {
+				localStorage.setItem('test', loc.query.test)
+			}
+		}
+	})
   return (
 	<>
       <div class="flex min-h-full">
@@ -20,12 +41,7 @@ export default component$(() => {
               <p class="text-sm font-medium text-gray-700 text-center">Prihlásiť sa cez</p>
               <div class="mt-1 flex justify-center">
                 <a
-                  href="http://localhost:8000/auth/google"
-                  /* preventdefault:click
-                  onClick$={async () => {
-                    const data = await AuthApi.authenticateWithGoogle()
-                    console.log(data);
-                  }} */
+                  href={ baseUrl + 'auth/google' }
                   class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-red-600 bg-white py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-red-500"
                 >
                   <span class="sr-only">Prihlásiť sa cez Google</span>
@@ -40,7 +56,6 @@ export default component$(() => {
           </div>
         </div>
         <div class="relative hidden w-0 flex-1 lg:block">
-
           <img
             class="absolute inset-0 h-full w-full object-cover"
             src="https://images.unsplash.com/photo-1505904267569-f02eaeb45a4c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"

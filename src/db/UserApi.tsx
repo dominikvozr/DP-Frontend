@@ -1,23 +1,21 @@
 import axios from "axios";
 import { baseUrl } from "~/db/url";
 
-export class AuthApi {
-	static authenticateWithGoogle = async () => {
-
+export class UserApi {
+  static setTest (test: any): any {
+    throw new Error('Method not implemented.');
+  }
+	static checkAuthorization = async (cookies : any) => {
 		try {
-			const url = baseUrl + 'auth/google/'
-			const res = await axios.get(url, {
+			const res = await axios.get(baseUrl + 'api/v1/user/check-authorization', {
 				withCredentials: true,
 				headers: {
-					'Content-Type': 'application/json'
+					Cookie: cookies
 				}
 			})
-			if (res.status !== 200)
-				return res
 			return res.data
-
-		} catch (error) {
-			console.error(error);
+		} catch (e) {
+			console.error(e);
 		}
 	}
 
