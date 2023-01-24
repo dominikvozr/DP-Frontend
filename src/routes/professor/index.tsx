@@ -27,14 +27,14 @@ export default component$(() => {
 	const projects = [
 		{
       id: 1,
-			name: 'VSA zápočet 2023',
+			name: 'VSA exam 2023',
 			href: '/professor/test/1',
 			siteHref: 'workspace/1',
 			repoHref: 'repository/1',
-			repo: 'B-API/vsa_zapocet_2023',
+			repo: 'B-API/vsa_exam_2023',
 			tech: 'Java',
-			lastDeploy: '21. marec o 14:00',
-			location: 'Otvorené',
+			lastDeploy: '21. march at 14:00',
+			location: 'Open',
 			starred: true,
 			active: true,
 		},
@@ -84,13 +84,13 @@ export default component$(() => {
 												href="/professor/test/create"
 												class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 xl:w-full"
 											>
-												Nový Test
+												New Test
 											</a>
 											<a
 												href="/professor/template/create"
 												class="mt-3 inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 xl:ml-0 xl:mt-3 xl:w-full"
 											>
-												Nový template
+												New template
 											</a>
 										</div>
 									</div>
@@ -98,7 +98,7 @@ export default component$(() => {
 									<div class="flex flex-col space-y-6 sm:flex-row sm:space-y-0 sm:space-x-8 xl:flex-col xl:space-x-0 xl:space-y-6">
 										<div class="flex items-center space-x-2">
 											<QRectangleStackIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-											<span class="text-sm font-medium text-gray-500">8 Testov</span>
+											<span class="text-sm font-medium text-gray-500">Tests: 1</span>
 										</div>
 									</div>
 								</div>
@@ -110,7 +110,7 @@ export default component$(() => {
 					<div class="bg-white lg:min-w-0 lg:flex-1">
 						<div class="border-b border-t border-gray-200 pl-4 pr-6 pt-4 pb-4 sm:pl-6 lg:pl-8 xl:border-t-0 xl:pl-6 xl:pt-6">
 							<div class="flex items-center">
-								<h1 class="flex-1 text-lg font-medium">Testy</h1>
+								<h1 class="flex-1 text-lg font-medium">Tests</h1>
 							</div>
 						</div>
 						<ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">

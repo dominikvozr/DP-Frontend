@@ -1,4 +1,5 @@
 import { component$, $, useStylesScoped$, useStore, useSignal } from '@builder.io/qwik';
+import { Logo } from '../logo/logo';
 import styles from './header.css?inline';
 
 export default component$(() => {
@@ -29,7 +30,7 @@ export default component$(() => {
           {/* Logo section */}
           <div class="flex items-center px-2 lg:px-0 xl:w-64">
             <div class="flex-shrink-0">
-              <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300" alt="Your Company" />
+              <Logo svgClass="w-20" color='#fff' />
             </div>
           </div>
 

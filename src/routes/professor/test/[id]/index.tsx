@@ -316,9 +316,8 @@ const directory = {
                             type="button"
                             class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                           >
-
                             <QCommandLineIcon className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
-                            <span>Otvoriť workspace</span>
+                            <span>Open workspace</span>
                           </button>
                         </div>
                       </div>
@@ -377,8 +376,8 @@ const directory = {
             </main>
             <aside class="md:w-64 lg:w-96 flex-shrink-0 border-r border-gray-200 order-first flex flex-col">
               <div class="px-6 pt-6 pb-4">
-                <h2 class="text-lg font-medium text-gray-900">Pozvaní študenti</h2>
-                <p class="mt-1 text-sm text-gray-600">Aktívny: 38 Neaktívny: 3</p>
+                <h2 class="text-lg font-medium text-gray-900">Invited Students</h2>
+                <p class="mt-1 text-sm text-gray-600">Active: 38</p>
                 <form class="mt-6 flex space-x-4" action="#">
                   <div class="min-w-0 flex-1">
                     <label htmlFor="search" class="sr-only">
