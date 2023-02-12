@@ -9,13 +9,13 @@ import Header from '~/components/header/header';
 import { User } from '~/models/User';
 import { UserApi } from '~/db/UserApi';
 
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
+/* export const onGet: RequestHandler<User> = async ({ request, response }) => {
 	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
 	if (!isAuthorized) {
 		throw response.redirect('/login')
 	}
   return user
-};
+}; */
 
 export default component$(() => {
   const userResource = useEndpoint<User>()
