@@ -1,23 +1,33 @@
 import { baseUrl } from "~/db/url";
 
-export class UserApi {
-	static createTest = async (cookies : any, data: any) => {
+export class TestApi {
+	static createTest = async (data: any) => {
 		try {
 			const res = await fetch(baseUrl + 'api/v1/professor/test/create', {
 				method: 'POST',
-        mode: 'cors',
         credentials: 'include',
         body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          Accept: 'application/json',
-          Cookie: cookies
-        }
 			})
-			return res.json()
+			return await res.json()
 		} catch (e) {
 			console.error(e);
 		}
 	}
+
+  static uploadTestProject = async (destination: string, file: File) => {
+		try {
+      const formData = new FormData()
+      formData.append(destination, file)
+        const res = await fetch(`${baseUrl}api/v1/professor/test/upload/${destination}`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        })
+        return await res.json()
+
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 }

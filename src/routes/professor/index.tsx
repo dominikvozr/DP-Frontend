@@ -1,5 +1,5 @@
 import { qwikify$ } from '@builder.io/qwik-react';
-import { component$ } from "@builder.io/qwik"
+import { component$, useTask$, useStore } from "@builder.io/qwik"
 import StarIcon from '@heroicons/react/20/solid/StarIcon'
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon'
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon'
@@ -9,20 +9,28 @@ import Header from '~/components/header/header';
 import { User } from '~/models/User';
 import { UserApi } from '~/db/UserApi';
 
-/* export const onGet: RequestHandler<User> = async ({ request, response }) => {
+export const onGet: RequestHandler<User> = async ({ request, response }) => {
 	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
 	if (!isAuthorized) {
 		throw response.redirect('/login')
 	}
   return user
-}; */
+};
 
 export default component$(() => {
+  const state = useStore({
+    user: {}
+  })
   const userResource = useEndpoint<User>()
 	const QCheckBadgeIcon = qwikify$(CheckBadgeIcon)
 	const QChevronRightIcon = qwikify$(ChevronRightIcon)
 	const QRectangleStackIcon = qwikify$(RectangleStackIcon)
 	const QStarIcon = qwikify$(StarIcon)
+
+  useTask$(async () => {
+    state.user = await userResource.value as User
+  });
+
 
 	const projects = [
 		{
@@ -69,7 +77,7 @@ export default component$(() => {
 												/>
 											</div>
 											<div class="space-y-1">
-												<div class="text-sm font-medium text-gray-900">Debbie Lewis</div>
+												<div class="text-sm font-medium text-gray-900">{state.user.displayName}</div>
 												<a href="#" class="group flex items-center space-x-1">
 													<QCheckBadgeIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
 													<span class="text-sm font-medium text-gray-500 group-hover:text-gray-900">
@@ -263,3 +271,7 @@ export const head: DocumentHead = {
 		},
 	],
 };
+
+function useStore$ (arg0: { user: {}; }) {
+  throw new Error('Function not implemented.');
+}
