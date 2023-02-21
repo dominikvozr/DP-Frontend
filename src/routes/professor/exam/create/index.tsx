@@ -1,49 +1,78 @@
-import { component$, useStore, $, noSerialize, useSignal } from "@builder.io/qwik"
+import { component$, useStore, $, useSignal, useTask$} from "@builder.io/qwik"
 import { DocumentHead, RequestHandler, useEndpoint, useNavigate } from '@builder.io/qwik-city';
 import Header from '~/components/header/header';
 import { User } from '~/models/User';
-import { UserApi } from '~/db/UserApi';
-import { baseUrl } from "~/db/url";
-import { TestApi } from "~/db/TestApi";
+import { ExamApi } from "~/db/ExamApi";
+import { PipelineApi } from "~/db/PipelineApi";
+import { Pipeline } from "~/models/Pipeline";
 
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
-	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
+interface ExamData {
+  user: User,
+  pipelines: Array<Pipeline>,
+}
+
+export const onGet: RequestHandler<ExamData> = async ({ response }) => {
+	const {user, pipelines, isAuthorized} = await PipelineApi.getPipelinesData()
 	if (!isAuthorized) {
 		throw response.redirect('/login')
 	}
-  return user
+  return {user, pipelines}
 };
 
 export default component$(() => {
     const nav = useNavigate()
+    const store = useStore({
+      pipelines: [],
+      user: {},
+    })
     const state = useStore({
-        examName: '',
+        name: '',
         description: '',
         subject: '',
         startDate: '',
         endDate: '',
         project: '',
-        tests: [],
-        testsFile: {},
+        exams: [],
+        examsFile: {},
         pipelineId: '',
-        templateId: '',
+        templateId: 0,
         points: 0
-    })
+    }, {recursive: true})
     const loading = useSignal<boolean>(false);
 
     const handleUpload = $(async(destination: string, file: File) => {
-      const data = await TestApi.uploadTestProject(destination, file)
+      const data = await ExamApi.uploadExamProject(destination, file)
         if (destination === 'project') {
           state.project = data
         } else {
-          state.tests = data.matches
-          state.testsFile = data.file
+          state.exams = data.matches
+          state.examsFile = data.file
         }
     });
 
-  const userResource = useEndpoint<User>()
+    const handleCreate = $(async () => {
+      const response = await ExamApi.createExam(state)
+      if(response.message === "success")
+        nav.path = '/professor'
+    })
+
+    const recalculatePoints = $(() => {
+      state.points = state.exams.reduce((acc, obj) => acc + obj.points, 0) || 0
+    })
+
+  const examResource = useEndpoint<ExamData>()
+
+  useTask$(async () => {
+    const data = await examResource.value
+    store.user = data.user
+    store.pipelines = data.pipelines
+  });
+
   return (
 	<>
+  {
+    JSON.stringify(examResource.value)
+  }
     <div class="relative flex min-h-full flex-col bg-gray-100">
       <Header />
       <div class="mx-auto max-w-screen-xl mt-6 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
@@ -64,7 +93,7 @@ export default component$(() => {
                         <label for="name" class="block text-sm font-medium text-gray-700">Názov testu</label>
                         <input type="text" name="name" id="name"
                           onInput$={(ev: any) => {
-                            state.examName = ev.target.value
+                            state.name = ev.target.value
                           }}
                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
                       </div>
@@ -91,7 +120,7 @@ export default component$(() => {
                     </div>
                     <div class="grid grid-cols-2 gap-6">
                       <div class="flex space-x-3 sm:pt-5">
-                        <label htmlFor="start-date" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 self-center">
+                        <label for="start-date" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 self-center">
                           Začiatok
                         </label>
                         <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
@@ -108,7 +137,7 @@ export default component$(() => {
                         </div>
                       </div>
                       <div class="flex space-x-3 sm:pt-5">
-                        <label htmlFor="end-date" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 self-center">
+                        <label for="end-date" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 self-center">
                           Koniec
                         </label>
                         <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
@@ -138,7 +167,7 @@ export default component$(() => {
                               <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
                                 <span>Nahraj projekt (.zip)</span>
                                 <div>{state.project && `${state.project.name}`}</div>
-                                <input id="file-upload" name="project"
+                                <input id="file-upload" name="project" accept=".zip"
                                   onChange$={(ev: any) => {
                                     handleUpload('project', ev.target.files[0])
                                   }}
@@ -159,7 +188,7 @@ export default component$(() => {
                             <div class="flex text-sm text-gray-600">
                               <label for="tests" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
                                 <span>Nahraj testy</span>
-                                <div>{state.tests && `${state.testsFile.name}`}</div>
+                                <div>{state.exams && `${state.examsFile.name}`}</div>
                                 <input id="tests" name="tests"
                                   onInput$={(ev: any) => {
                                     handleUpload('tests', ev.target.files[0])
@@ -200,20 +229,32 @@ export default component$(() => {
                     <div class="flex sm:pt-5">
                       <label for="pipeline" class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center">Pipeline</label>
                       <div class="mt-1 sm:mt-0">
-                        <select id="pipeline" value={state.pipelineId} name="pipeline" class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
-                          <option value={1}>United States</option>
-                          <option value={2}>Canada</option>
-                          <option value={3}>Mexico</option>
+                        <select id="pipeline"
+                          onChange$={(evt) => {
+                            state.pipelineId = evt.target.value;
+                          }}
+                          name="pipeline" class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
+                          {
+                            store.pipelines.map((pipeline: Pipeline) => {
+                              return (
+                                <option value={pipeline._id} selected={state.pipelineId === pipeline._id}>{pipeline.name}</option>
+                              )
+                            })
+                          }
                         </select>
                       </div>
                     </div>
                     <div class="flex sm:pt-5">
                       <label for="template" class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center">Template</label>
                       <div class="mt-1 sm:mt-0">
-                        <select value={state.templateId} id="template" name="template" class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
-                          <option value={1}>IntelliJ IDEA</option>
-                          <option value={2}>PyCharm</option>
-                          <option value={3}>Clion</option>
+                        <select
+                           onChange$={(evt) => {
+                            state.templateId = parseInt(evt.target.value);
+                          }}
+                          id="template" name="template" class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
+                          <option value={1} selected={state.templateId === 1}>IntelliJ IDEA</option>
+                          <option value={2} selected={state.templateId === 2}>PyCharm</option>
+                          <option value={3} selected={state.templateId === 3}>Clion</option>
                         </select>
                       </div>
                     </div>
@@ -224,7 +265,7 @@ export default component$(() => {
           </div>
         </div>
 
-        { state.tests.length ? (<>
+        { state.exams.length ? (<>
 
         <div class="hidden sm:block" aria-hidden="true">
           <div class="py-5">
@@ -243,7 +284,7 @@ export default component$(() => {
                 <div class="overflow-hidden shadow sm:rounded-md">
                   <div class="bg-white px-4 py-5 sm:p-6">
                     {
-                      state.tests.map((test) => {
+                      state.exams.map((test) => {
                         return (
                           <div class="flex align-middle justify-between space-x-4">
                             <label for="name" class="block text-sm w-72 font-medium text-gray-700 self-center text-md tracking-wider">
@@ -251,7 +292,8 @@ export default component$(() => {
                             </label>
                             <input type="number" step={0.5} name="name" id="name"
                               onInput$={(ev: any) => {
-                                state.tests[test.id - 1].points = parseFloat(ev.target.value)
+                                state.exams[test.id - 1].points = parseFloat(ev.target.value)
+                                recalculatePoints()
                               }}
                             class="mt-1 block w-24 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
                           </div>
@@ -260,15 +302,11 @@ export default component$(() => {
                     }
                   </div>
                   <div class="bg-gray-50 px-4 py-3 text-right sm:px-6 flex space-x-6 justify-end">
-                    <div class="self-center">celkový počet bodov: {state.tests.reduce((acc, obj) => acc + obj.points, 0) || 0}</div>
+                    <div class="self-center">celkový počet bodov: {state.points}</div>
                     <button
                       type="submit"
                       disabled={loading.value}
-                      onClick$={async () => {
-                        const response = await TestApi.createTest(state)
-                        if(response.message === "success")
-                          nav.path = '/professor'
-                      }}
+                      onClick$={handleCreate}
                       class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                       Uložiť test</button>
                   </div>
@@ -292,7 +330,3 @@ export const head: DocumentHead = {
 		},
 	],
 };
-
-function useSignal$ (arg0: boolean) {
-  throw new Error("Function not implemented.");
-}

@@ -7,28 +7,37 @@ import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon'
 import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
 import Header from '~/components/header/header';
 import { User } from '~/models/User';
-import { UserApi } from '~/db/UserApi';
+import { ExamApi } from '~/db/ExamApi';
+import { Exam } from '~/models/Exam';
 
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
-	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
+interface ProfesorData {
+  user: User,
+  exams: Array<Exam>
+}
+
+export const onGet: RequestHandler<ProfesorData> = async ({ response }) => {
+	const {user, exams, isAuthorized} = await ExamApi.getExams()
 	if (!isAuthorized) {
 		throw response.redirect('/login')
 	}
-  return user
+  return { user, exams }
 };
 
 export default component$(() => {
   const state = useStore({
-    user: {}
+    user: {},
+    exams: []
   })
-  const userResource = useEndpoint<User>()
+  const dataResource = useEndpoint<ProfesorData>()
 	const QCheckBadgeIcon = qwikify$(CheckBadgeIcon)
 	const QChevronRightIcon = qwikify$(ChevronRightIcon)
 	const QRectangleStackIcon = qwikify$(RectangleStackIcon)
 	const QStarIcon = qwikify$(StarIcon)
 
   useTask$(async () => {
-    state.user = await userResource.value as User
+    const data = await dataResource.value as ProfesorData
+    state.user = data.user
+    state.exams = data.exams
   });
 
 
@@ -89,12 +98,18 @@ export default component$(() => {
 										{/* Action buttons */}
 										<div class="flex flex-col sm:flex-row xl:flex-col">
 											<a
-												href="/professor/test/create"
+												href="/professor/exam/create"
 												class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 xl:w-full"
 											>
-												New Test
+												New Exam
 											</a>
 											<a
+												href="/professor/pipeline/create"
+												class="mt-3 inline-flex items-center justify-center rounded-md border border-gray-300 bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 xl:ml-0 xl:mt-3 xl:w-full"
+											>
+												New pipeline
+											</a>
+                      <a
 												href="/professor/template/create"
 												class="mt-3 inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 xl:ml-0 xl:mt-3 xl:w-full"
 											>
@@ -122,9 +137,9 @@ export default component$(() => {
 							</div>
 						</div>
 						<ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
-							{projects.map((project) => (
+							{state.exams.map((exam) => (
 								<li
-									key={project.repo}
+									key={exam._id}
 									class="relative py-5 pl-4 pr-6 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6"
 								>
 									<div class="flex items-center justify-between space-x-4">
@@ -133,30 +148,30 @@ export default component$(() => {
 											<div class="flex items-center space-x-3">
 												<span
                           class={{
-                            'bg-green-100': project.active,
-                            'bg-gray-100': !project.active,
+                            'bg-green-100': exam.isOpen,
+                            'bg-gray-100': !exam.isOpen,
                             "h-4 w-4 rounded-full flex items-center justify-center": true,
                           }}
 													aria-hidden="true"
 												>
 													<span
                             class={{
-                              'bg-green-400': project.active,
-                              'bg-gray-400': !project.active,
+                              'bg-green-400': exam.isOpen,
+                              'bg-gray-400': !exam.isOpen,
                               "h-2 w-2 rounded-full": true,
                             }}
 													/>
 												</span>
 
 												<h2 class="text-sm font-medium">
-													<a href={project.href}>
+													<a href={`/professor/exam/${exam._id}`}>
 														<span class="absolute inset-0" aria-hidden="true" />
-														{project.name}{' '}
-														<span class="sr-only">{project.active ? 'Running' : 'Not running'}</span>
+														{exam.name}{' '}
+														<span class="sr-only">{exam.isOpen ? 'Running' : 'Not running'}</span>
 													</a>
 												</h2>
 											</div>
-											<a href={project.repoHref} class="group relative flex items-center space-x-2.5">
+											<a href={exam.projectRepo} class="group relative flex items-center space-x-2.5">
 												<svg
 													class="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
 													viewBox="0 0 18 18"
@@ -172,7 +187,7 @@ export default component$(() => {
 													/>
 												</svg>
 												<span class="truncate text-sm font-medium text-gray-500 group-hover:text-gray-900">
-													{project.repo}
+													{exam.subject}/{exam.name}
 												</span>
 											</a>
 										</div>
@@ -180,10 +195,10 @@ export default component$(() => {
 											<QChevronRightIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
 										</div>
 										{/* Repo meta info */}
-										<div class="hidden flex-shrink-0 flex-col items-end space-y-3 sm:flex">
+										{/* <div class="hidden flex-shrink-0 flex-col items-end space-y-3 sm:flex">
 											<div class="flex items-center space-x-4">
 												<a
-													href={project.siteHref}
+													href={exam.siteHref}
 													class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
 												>
 													Visit site
@@ -193,10 +208,10 @@ export default component$(() => {
 													class="relative rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 												>
 													<span class="sr-only">
-														{project.starred ? 'Add to favorites' : 'Remove from favorites'}
+														{exam.starred ? 'Add to favorites' : 'Remove from favorites'}
 													</span>
 													<QStarIcon
-														className={ project.starred
+														className={ exam.starred
 																? 'text-yellow-300 hover:text-yellow-400 h-5 w-5'
 																: 'text-gray-300 hover:text-gray-400 h-5 w-5'
 														}
@@ -205,13 +220,13 @@ export default component$(() => {
 												</button>
 											</div>
 											<p class="flex space-x-2 text-sm text-gray-500">
-												<span>{project.tech}</span>
+												<span>{exam.tech}</span>
 												<span aria-hidden="true">&middot;</span>
-												<span>{project.lastDeploy}</span>
-												{/* <span aria-hidden="true">&middot;</span>
-												<span>{project.location}</span> */}
+												<span>{exam.lastDeploy}</span>
+												<span aria-hidden="true">&middot;</span>
+												<span>{project.location}</span>
 											</p>
-										</div>
+										</div> */}
 									</div>
 								</li>
 							))}
