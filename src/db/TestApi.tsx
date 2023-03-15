@@ -1,9 +1,9 @@
 import { baseUrl } from "~/db/url";
 
-export class ExamApi {
-	static createExam = async (data: any) => {
+export class TestApi {
+	static createTest = async (data: any) => {
 		try {
-			const res = await fetch(baseUrl + 'api/v1/professor/exam/create', {
+			const res = await fetch(baseUrl + 'api/v1/student/test/create', {
 				method: 'POST',
         credentials: 'include',
         body: JSON.stringify(data),
@@ -17,47 +17,29 @@ export class ExamApi {
 		}
 	}
 
-  static getExams = async (cookies: any, page: string) => {
+  static getTests = async (cookies: any) => {
 		try {
-			const res = await fetch(baseUrl + 'api/v1/professor/exam/index?page=' + page, {
+			const res = await fetch(baseUrl + 'api/v1/student/test/index', {
 				method: 'GET',
         credentials: 'include',
         headers: {
 					Cookie: cookies
 				}
 			})
-			let data =  await res.json()
+			const {user, tests, isAuthorized} =  await res.json()
 
       /* const userData = user? new User(user) : undefined
       const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
 
-      return data
+      return {user, tests, isAuthorized}
 		} catch (e) {
 			console.error(e);
 		}
 	}
 
-  static getExamBySlug = async (slug: string, cookies: any) => {
+  static getTestBySlug = async (slug: string, cookies: any) => {
 		try {
-			const res = await fetch(baseUrl + 'api/v1/professor/exam/get?test=' + slug, {
-				method: 'GET',
-        credentials: 'include',
-        headers: {
-					Cookie: cookies
-				}
-			})
-			let data =  await res.json()
-      /* const userData = user? new User(user) : undefined
-      const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
-      return data
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
-  static getExamById = async (id: string, cookies: any) => {
-		try {
-			const res = await fetch(baseUrl + 'api/v1/professor/exam/show/' + id, {
+			const res = await fetch(baseUrl + 'api/v1/student/test/get?test=' + slug, {
 				method: 'GET',
         credentials: 'include',
         headers: {
@@ -67,6 +49,43 @@ export class ExamApi {
 			let data =  await res.json()
       /* const userData = user? new User(user) : undefined
       const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
+      return data
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+  static getTestByExamSlug = async (slug: string, cookies: any) => {
+		try {
+			const res = await fetch(baseUrl + 'api/v1/student/test/exam/' + slug, {
+				method: 'GET',
+        credentials: 'include',
+        headers: {
+					Cookie: cookies
+				}
+			})
+
+			let data =  await res.json()
+      /* const userData = user? new User(user) : undefined
+      const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
+      return data
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+  static getTestById = async (id: string, cookies: any) => {
+		try {
+			const res = await fetch(baseUrl + 'api/v1/student/test/show/' + id, {
+				method: 'GET',
+        credentials: 'include',
+        headers: {
+					Cookie: cookies
+				}
+			})
+			let data =  await res.json()
+      /* const userData = user? new User(user) : undefined
+      const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
 
       return data
 		} catch (e) {
@@ -74,9 +93,9 @@ export class ExamApi {
 		}
 	}
 
-  static deleteExam = async (id: string) => {
+  static deleteTest = async (id: string) => {
 		try {
-			const res = await fetch(baseUrl + 'api/v1/professor/exam/delete/' + id, {
+			const res = await fetch(baseUrl + 'api/v1/student/test/delete/' + id, {
 				method: 'POST',
         credentials: 'include',
         body: JSON.stringify({id})
@@ -88,11 +107,11 @@ export class ExamApi {
 		}
 	}
 
-  static uploadExamProject = async (destination: string, file: File) => {
+  static uploadTestProject = async (destination: string, file: File) => {
 		try {
       const formData = new FormData()
       formData.append(destination, file)
-        const res = await fetch(`${baseUrl}api/v1/professor/exam/upload/${destination}`, {
+        const res = await fetch(`${baseUrl}api/v1/student/test/upload/${destination}`, {
           method: 'POST',
           credentials: 'include',
           body: formData,

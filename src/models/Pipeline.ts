@@ -1,7 +1,9 @@
+import { User } from "./User";
+
 export class Pipeline {
 	_id: string;
 	name: string;
-  userId: string;
+  user: User;
   description: string;
   file: object;
   slug: string;
@@ -12,7 +14,7 @@ export class Pipeline {
 	constructor(
     _id: string,
     name: string,
-    userId: string,
+    user: User,
     description: string,
     file: object,
     slug: string,
@@ -22,7 +24,7 @@ export class Pipeline {
     ) {
       this._id = _id
       this.name = name
-      this.userId = userId
+      this.user = user
       this.description = description
       this.file = file
       this.createdAt = createdAt

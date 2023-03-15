@@ -4,8 +4,8 @@ import { UserApi } from '~/db/UserApi';
 import { User } from '~/models/User';
 
 export const onGet: RequestHandler<User> = async ({ url, request, response }) => {
-	const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'))
-	if (!isAuthorized)
+	const data = await UserApi.checkAuthorization(request.headers.get('cookie'))
+	if (!data.isAuthorized)
 		throw response.redirect('/login')
   else if (url.searchParams.has('test'))
     throw response.redirect(`/student?test=${url.searchParams.get('test')}`);

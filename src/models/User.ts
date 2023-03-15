@@ -1,42 +1,44 @@
-export class User {
-	_id: String;
-	email: String;
-	name: String;
-	displayName: String;
-  avatarUrl: String;
-	slug: String;
-	googleId: String;
-	googleToken: String;
-	isSignedupViaGoogle: Boolean;
-  darkTheme: Boolean;
-  createdAt: Date;
-  test: String | null;
+export interface UserInterface {
+  _id: string,
+  email: string,
+  name: string,
+  displayName: string,
+  avatarUrl: string,
+  slug: string,
+  googleId: string,
+  googleToken: string,
+  isSignedupViaGoogle: Boolean,
+  darkTheme: Boolean,
+  createdAt: Date,
+  test: string | null,
+}
 
-	constructor(
-    _id: String,
-    email: String,
-    name: String,
-    displayName: String,
-    avatarUrl: String,
-    slug: String,
-    googleId: String,
-    googleToken: String,
-    isSignedupViaGoogle: Boolean,
-    darkTheme: Boolean,
-    createdAt: Date,
-    test: String | null,
-    ) {
-      this._id = _id
-      this.email = email
-      this.name = name
-      this.displayName = displayName
-      this.avatarUrl = avatarUrl
-      this.slug = slug
-      this.googleId = googleId
-      this.googleToken = googleToken
-      this.isSignedupViaGoogle = isSignedupViaGoogle
-      this.darkTheme = darkTheme
-      this.createdAt = createdAt
-      this.test = test
+export class User {
+	_id: string = '';
+	email: string = '';
+	name: string = '';
+	displayName: string = '';
+  avatarUrl: string = '';
+	slug: string = '';
+	googleId: string = '';
+	googleToken: string = '';
+	isSignedupViaGoogle: Boolean = false;
+  darkTheme: Boolean = false;
+  createdAt: Date = new Date();
+  test: string | null = '';
+
+	constructor(userData: UserInterface) {
+      this._id = userData._id
+      this.email = userData.email
+      this.name = userData.name
+      this.displayName = userData.displayName
+      this.avatarUrl = userData.avatarUrl
+      this.slug = userData.slug
+      this.googleId = userData.googleId
+      this.googleToken = userData.googleToken
+      this.isSignedupViaGoogle = userData.isSignedupViaGoogle
+      this.darkTheme = userData.darkTheme
+      this.createdAt = userData.createdAt
+      this.test = userData.test
 	}
 }

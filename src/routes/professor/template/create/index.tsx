@@ -4,21 +4,9 @@ import StarIcon from '@heroicons/react/20/solid/StarIcon'
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon'
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon'
 import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon'
-import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
-import Header from '~/components/header/header';
-import { User } from '~/models/User';
-import { UserApi } from '~/db/UserApi';
-
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
-	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
-	if (!isAuthorized) {
-		throw response.redirect('/login')
-	}
-  return user
-};
+import { DocumentHead } from '@builder.io/qwik-city';
 
 export default component$(() => {
-  const userResource = useEndpoint<User>()
 	const QCheckBadgeIcon = qwikify$(CheckBadgeIcon)
 	const QChevronRightIcon = qwikify$(ChevronRightIcon)
 	const QRectangleStackIcon = qwikify$(RectangleStackIcon)
@@ -26,7 +14,6 @@ export default component$(() => {
   return (
 	<>
     <div class="relative flex min-h-full flex-col bg-gray-100">
-      <Header />
       <div class="mx-auto max-w-screen-xl mt-6 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
         <div>
           <div class="md:grid md:grid-cols-3 md:gap-6">

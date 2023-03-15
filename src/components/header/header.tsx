@@ -1,27 +1,28 @@
-import { component$, $, useStylesScoped$, useStore, useSignal } from '@builder.io/qwik';
+import { component$, useStylesScoped$, useStore, useSignal, useContext } from '@builder.io/qwik';
+import { useNavigate } from '@builder.io/qwik-city';
+import { UserDataContext } from '~/contexts/contexts';
+import { UserApi } from '~/db/UserApi';
 import { Logo } from '../logo/logo';
 import styles from './header.css?inline';
 
-export default component$(() => {
+export const Header = component$(() => {
   useStylesScoped$(styles);
-
+  const userData = useContext(UserDataContext)
   const state = useStore({
     showNavDropdown: false
   });
-
+  const nav = useNavigate()
   const navDropdown = useSignal<Element>();
 
-
-  const classNames$ = $((...classes: string[]) => classes.filter(Boolean).join(' '));
+  //const classNames$ = $((...classes: string[]) => classes.filter(Boolean).join(' '));
 
   const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Live tests', href: '#', current: false },
+    { name: 'My exams', href: '/professor', current: true },
+    { name: 'Passed tests', href: '/student', current: true },
   ]
   const userNavigation = [
     { name: 'Your Profile', href: '#' },
     { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
   ]
   return (
     <nav class="flex-shrink-0 bg-indigo-600" >
@@ -102,10 +103,11 @@ export default component$(() => {
                     }}
                     class="flex rounded-full bg-indigo-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="sr-only">Open user menu</span>
-                    <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&h=256&q=80" alt="" />
+                    {userData.user && (
+                      <img class="h-8 w-8 rounded-full" src={userData.user.avatarUrl} alt="avatar" />
+                    )}
                   </button>
                 </div>
-
                 <div ref={navDropdown} class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hideNavDropdown" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex={-1}>
                   {/* Active: "bg-gray-100", Not Active: "" */}
                   {userNavigation.map((item) => (
@@ -113,15 +115,27 @@ export default component$(() => {
 
                       <a
                         href={item.href}
-                        class={classNames$(
-                          'bg-gray-100',
-                          'block px-4 py-2 text-sm text-gray-700'
-                        )}
+                        class="bg-gray-100 block px-4 py-2 text-sm text-gray-700"
                         role="menuitem" tabIndex={-1}>
                         {item.name}
                       </a>
                     </div>
                   ))}
+                  <div>
+                      <a
+                        href="#"
+                        preventdefault:click
+                        onClick$={async() => {
+                          const data: {message: string} = await UserApi.logout()
+                          if (data.message === "success") {
+                            nav.path = '/login'
+                          }
+                        }}
+                        class="bg-gray-100 block px-4 py-2 text-sm text-gray-700"
+                        role="menuitem" tabIndex={-1}>
+                        Sign Out
+                      </a>
+                    </div>
                 </div>
               </div>
             </div>
@@ -133,9 +147,8 @@ export default component$(() => {
   <div class="lg:hidden" id="mobile-menu">
     <div class="space-y-1 px-2 pt-2 pb-3">
       {/* Current: "text-white bg-indigo-800", Default: "text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600" */}
-      <a href="#" class="text-white bg-indigo-800 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</a>
-
-      <a href="#" class="text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Domains</a>
+      <a href="/professor" class="text-white bg-indigo-800 block px-3 py-2 rounded-md text-base font-medium" aria-current="page">My tests</a>
+      <a href="/student" class="text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Passed Exams</a>
     </div>
     <div class="border-t border-indigo-800 pt-4 pb-3">
       <div class="space-y-1 px-2">
@@ -143,7 +156,15 @@ export default component$(() => {
 
         <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100">Settings</a>
 
-        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100">Sign out</a>
+        <a href="#"
+          preventdefault:click
+          onClick$={async() => {
+            const data: {message: string} = await UserApi.logout()
+            if (data.message === "success") {
+              nav.path = '/login'
+            }
+          }}
+          class="block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100">Sign out</a>
       </div>
     </div>
   </div>

@@ -5,12 +5,18 @@ import { baseUrl } from "~/db/url";
 import { UserApi } from "~/db/UserApi";
 import { User } from "~/models/User";
 
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
-	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
-	if (isAuthorized) {
-		throw response.redirect('/')
-	}
-  return user
+export const onGet: RequestHandler<User> = async ({ request, response, url }) => {
+	const data = await UserApi.checkAuthorization(request.headers.get('cookie'))
+
+  if(!data.isAuthorized) return
+
+  let redirect = '/professor'
+  if (url.searchParams.has('test'))
+    redirect =`/student/test/${url.searchParams.get('test')}`
+
+  if (data.isAuthorized)
+		throw response.redirect(redirect)
+  return data.user
 };
 
 export default component$(() => {

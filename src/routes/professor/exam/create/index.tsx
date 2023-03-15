@@ -1,29 +1,25 @@
 import { component$, useStore, $, useSignal, useTask$} from "@builder.io/qwik"
 import { DocumentHead, RequestHandler, useEndpoint, useNavigate } from '@builder.io/qwik-city';
-import Header from '~/components/header/header';
-import { User } from '~/models/User';
 import { ExamApi } from "~/db/ExamApi";
 import { PipelineApi } from "~/db/PipelineApi";
 import { Pipeline } from "~/models/Pipeline";
 
 interface ExamData {
-  user: User,
   pipelines: Array<Pipeline>,
 }
 
 export const onGet: RequestHandler<ExamData> = async ({ response }) => {
-	const {user, pipelines, isAuthorized} = await PipelineApi.getPipelinesData()
+	const {pipelines, isAuthorized} = await PipelineApi.getPipelinesData()
 	if (!isAuthorized) {
 		throw response.redirect('/login')
 	}
-  return {user, pipelines}
+  return {pipelines}
 };
 
 export default component$(() => {
     const nav = useNavigate()
     const store = useStore({
       pipelines: [],
-      user: {},
     })
     const state = useStore({
         name: '',
@@ -34,10 +30,11 @@ export default component$(() => {
         project: '',
         exams: [],
         examsFile: {},
-        pipelineId: '',
+        pipeline: '',
         templateId: 0,
         points: 0
     }, {recursive: true})
+
     const loading = useSignal<boolean>(false);
 
     const handleUpload = $(async(destination: string, file: File) => {
@@ -52,8 +49,8 @@ export default component$(() => {
 
     const handleCreate = $(async () => {
       const response = await ExamApi.createExam(state)
-      if(response.message === "success")
-        nav.path = '/professor'
+      /* if(response.message === "success")
+        nav.path = '/professor' */
     })
 
     const recalculatePoints = $(() => {
@@ -64,17 +61,14 @@ export default component$(() => {
 
   useTask$(async () => {
     const data = await examResource.value
-    store.user = data.user
+    console.log(data.pipelines);
     store.pipelines = data.pipelines
+    state.pipeline = data.pipelines[0]._id
   });
 
   return (
 	<>
-  {
-    JSON.stringify(examResource.value)
-  }
     <div class="relative flex min-h-full flex-col bg-gray-100">
-      <Header />
       <div class="mx-auto max-w-screen-xl mt-6 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
         <div>
           <div class="md:grid md:grid-cols-3 md:gap-6">
@@ -97,7 +91,6 @@ export default component$(() => {
                           }}
                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
                       </div>
-
                       <div class="col-span-6 sm:col-span-3">
                         <label for="subject" class="block text-sm font-medium text-gray-700">Predmet</label>
                         <input type="text" name="subject" id="subject"
@@ -231,13 +224,16 @@ export default component$(() => {
                       <div class="mt-1 sm:mt-0">
                         <select id="pipeline"
                           onChange$={(evt) => {
-                            state.pipelineId = evt.target.value;
+                            console.log(evt);
+
+                            state.pipeline = evt.target.value;
                           }}
                           name="pipeline" class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm">
+                            {state.pipeline}
                           {
                             store.pipelines.map((pipeline: Pipeline) => {
                               return (
-                                <option value={pipeline._id} selected={state.pipelineId === pipeline._id}>{pipeline.name}</option>
+                                <option value={pipeline._id} selected={state.pipeline === pipeline._id}>{pipeline.name}</option>
                               )
                             })
                           }

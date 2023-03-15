@@ -1,6 +1,5 @@
 import { component$, useStore, $, useSignal } from "@builder.io/qwik"
 import { DocumentHead, RequestHandler, useEndpoint, useNavigate } from '@builder.io/qwik-city';
-import Header from '~/components/header/header';
 import { User } from '~/models/User';
 import { UserApi } from '~/db/UserApi';
 import { PipelineApi } from "~/db/PipelineApi";
@@ -40,7 +39,6 @@ export default component$(() => {
   return (
 	<>
     <div class="relative flex min-h-full flex-col bg-gray-100">
-      <Header />
       <div class="mx-auto max-w-screen-xl mt-6 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
         <div>
           <div class="md:grid md:grid-cols-3 md:gap-6">
