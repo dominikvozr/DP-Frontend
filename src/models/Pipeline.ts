@@ -1,8 +1,8 @@
-import { User } from "./User";
+import { User } from './User';
 
 export class Pipeline {
-	_id: string;
-	name: string;
+  _id: string;
+  name: string;
   user: User;
   description: string;
   file: object;
@@ -11,7 +11,7 @@ export class Pipeline {
   language: string;
   type: string;
 
-	constructor(
+  constructor(
     _id: string,
     name: string,
     user: User,
@@ -21,15 +21,15 @@ export class Pipeline {
     createdAt: Date,
     language: string,
     type: string,
-    ) {
-      this._id = _id
-      this.name = name
-      this.user = user
-      this.description = description
-      this.file = file
-      this.createdAt = createdAt
-      this.slug = slug
-      this.language = language
-      this.type = type
-	}
+  ) {
+    this._id = _id;
+    this.name = name;
+    this.user = user;
+    this.description = description;
+    this.file = file;
+    this.createdAt = createdAt;
+    this.slug = slug;
+    this.language = language;
+    this.type = type;
+  }
 }

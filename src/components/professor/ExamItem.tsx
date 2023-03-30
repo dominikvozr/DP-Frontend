@@ -1,18 +1,17 @@
-import { component$, useStore } from "@builder.io/qwik";
-import { qwikify$ } from "@builder.io/qwik-react";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import { appUrl } from "~/db/url";
-import { Exam } from "~/models/Exam";
+import { component$, useStore } from '@builder.io/qwik';
+import { qwikify$ } from '@builder.io/qwik-react';
+import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon';
+import { appUrl } from '~/db/url';
 
 export interface ExamItemProps {
-  exam: Exam
+  exam: any;
 }
 
 export const ExamItem = component$<ExamItemProps>((props) => {
-  const QChevronRightIcon = qwikify$(ChevronRightIcon)
+  const QChevronRightIcon = qwikify$(ChevronRightIcon);
   const state = useStore({
     startDate: new Date(props.exam.startDate),
-    endDate: new Date(props.exam.endDate)
+    endDate: new Date(props.exam.endDate),
   });
   return (
     <div class="flex items-center justify-between space-x-4">
@@ -23,7 +22,7 @@ export const ExamItem = component$<ExamItemProps>((props) => {
             class={{
               'bg-green-100': props.exam.isOpen,
               'bg-gray-100': !props.exam.isOpen,
-              "h-4 w-4 rounded-full flex items-center justify-center": true,
+              'h-4 w-4 rounded-full flex items-center justify-center': true,
             }}
             aria-hidden="true"
           >
@@ -31,7 +30,7 @@ export const ExamItem = component$<ExamItemProps>((props) => {
               class={{
                 'bg-green-400': props.exam.isOpen,
                 'bg-gray-400': !props.exam.isOpen,
-                "h-2 w-2 rounded-full": true,
+                'h-2 w-2 rounded-full': true,
               }}
             />
           </span>
@@ -74,7 +73,7 @@ export const ExamItem = component$<ExamItemProps>((props) => {
             href="#"
             preventdefault:click
             onClick$={() => {
-              navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug)
+              navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug);
             }}
             class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
           >
@@ -99,9 +98,17 @@ export const ExamItem = component$<ExamItemProps>((props) => {
         <p class="flex space-x-2 text-sm text-gray-500">
           {/* <span>{props.exam.tech}</span>
           <span aria-hidden="true">&middot;</span> */}
-          <span>{state.startDate.toLocaleDateString('sk-SK') + ' o ' + state.startDate.toLocaleTimeString('sk-SK')}</span>
+          <span>
+            {state.startDate.toLocaleDateString('sk-SK') +
+              ' o ' +
+              state.startDate.toLocaleTimeString('sk-SK')}
+          </span>
           <span aria-hidden="true">&middot;</span>
-          <span>{state.endDate.toLocaleDateString('sk-SK') + ' o ' + state.endDate.toLocaleTimeString('sk-SK')}</span>
+          <span>
+            {state.endDate.toLocaleDateString('sk-SK') +
+              ' o ' +
+              state.endDate.toLocaleTimeString('sk-SK')}
+          </span>
           {/* <span aria-hidden="true">&middot;</span>
           <span>{project.location}</span> */}
         </p>

@@ -1,18 +1,17 @@
-import { component$, useStore } from "@builder.io/qwik";
-import { qwikify$ } from "@builder.io/qwik-react";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import { appUrl } from "~/db/url";
-import { Test } from "~/models/Test";
+import { component$, useStore } from '@builder.io/qwik';
+import { qwikify$ } from '@builder.io/qwik-react';
+import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon';
+import { appUrl } from '~/db/url';
 
 export interface TestItemProps {
-  test: Test
+  test: any;
 }
 
 export const TestItem = component$<TestItemProps>((props) => {
-  const QChevronRightIcon = qwikify$(ChevronRightIcon)
+  const QChevronRightIcon = qwikify$(ChevronRightIcon);
   const state = useStore({
     startDate: new Date(props.test.startedAt),
-    endDate: new Date(props.test.endedAt)
+    endDate: new Date(props.test.endedAt),
   });
 
   return (
@@ -24,7 +23,7 @@ export const TestItem = component$<TestItemProps>((props) => {
             class={{
               'bg-green-100': props.test.isOpen,
               'bg-gray-100': !props.test.isOpen,
-              "h-4 w-4 rounded-full flex items-center justify-center": true,
+              'h-4 w-4 rounded-full flex items-center justify-center': true,
             }}
             aria-hidden="true"
           >
@@ -32,7 +31,7 @@ export const TestItem = component$<TestItemProps>((props) => {
               class={{
                 'bg-green-400': props.test.isOpen,
                 'bg-gray-400': !props.test.isOpen,
-                "h-2 w-2 rounded-full": true,
+                'h-2 w-2 rounded-full': true,
               }}
             />
           </span>
@@ -75,7 +74,7 @@ export const TestItem = component$<TestItemProps>((props) => {
             href="#"
             preventdefault:click
             onClick$={() => {
-              navigator.clipboard.writeText(appUrl + 'login?test=' + props.test.slug)
+              navigator.clipboard.writeText(appUrl + 'login?test=' + props.test.slug);
             }}
             class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
           >
@@ -100,9 +99,17 @@ export const TestItem = component$<TestItemProps>((props) => {
         <p class="flex space-x-2 text-sm text-gray-500">
           {/* <span>{props.exam.tech}</span>
           <span aria-hidden="true">&middot;</span> */}
-          <span>{state.startDate.toLocaleDateString('sk-SK') + ' o ' + state.startDate.toLocaleTimeString('sk-SK')}</span>
+          <span>
+            {state.startDate.toLocaleDateString('sk-SK') +
+              ' o ' +
+              state.startDate.toLocaleTimeString('sk-SK')}
+          </span>
           <span aria-hidden="true">&middot;</span>
-          <span>{state.endDate.toLocaleDateString('sk-SK') + ' o ' + state.endDate.toLocaleTimeString('sk-SK')}</span>
+          <span>
+            {state.endDate.toLocaleDateString('sk-SK') +
+              ' o ' +
+              state.endDate.toLocaleTimeString('sk-SK')}
+          </span>
           {/* <span aria-hidden="true">&middot;</span>
           <span>{project.location}</span> */}
         </p>
