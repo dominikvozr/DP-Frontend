@@ -310,10 +310,10 @@ export default component$(() => {
                             {store.pipelines.map((pipeline: Pipeline) => {
                               return (
                                 <option
-                                  value={pipeline._id}
-                                  selected={state.pipeline === pipeline._id}
+                                  value={pipeline ? pipeline._id : ''}
+                                  selected={pipeline && state.pipeline === pipeline._id}
                                 >
-                                  {pipeline.name}
+                                  {pipeline && pipeline.name}
                                 </option>
                               );
                             })}
