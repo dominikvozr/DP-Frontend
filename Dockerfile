@@ -31,7 +31,7 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package*.json ./
 
 # Expose port 3000 (default port)
-EXPOSE 443
+EXPOSE 3000
 
 # Start the application
 CMD [ "node", "server/entry.express"]
