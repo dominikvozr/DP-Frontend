@@ -65,7 +65,7 @@ export default component$(() => {
   useTask$(async () => {
     const data = await examResource.value;
     store.pipelines = data.pipelines;
-    state.pipeline = data.pipelines[0]._id;
+    state.pipeline = data.pipelines ? data.pipelines[0]._id : '';
   });
 
   return (

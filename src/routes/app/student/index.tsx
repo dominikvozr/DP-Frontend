@@ -29,7 +29,7 @@ export const onGet: RequestHandler<StudentData> = async ({ request, response, ur
     throw response.redirect(`${appUrl}login`);
   }
 
-  return { tests: data.tests };
+  return { tests: data.tests, user: data.user };
 };
 
 export default component$(() => {
@@ -40,13 +40,14 @@ export default component$(() => {
   const dataResource = useEndpoint<any>();
   const QCheckBadgeIcon = qwikify$(CheckBadgeIcon);
   const QRectangleStackIcon = qwikify$(RectangleStackIcon);
+  const userData = useContext(UserDataContext);
 
   useTask$(async () => {
     const data = (await dataResource.value) as any;
     state.tests = data.tests;
+    userData.user = data.user;
   });
 
-  const userData = useContext(UserDataContext);
   const activityItems = [
     { project: 'Workcation', commit: '2d89f0c8', environment: 'production', time: '1h' },
   ];
@@ -77,7 +78,7 @@ export default component$(() => {
                         </div>
                         <div class="space-y-1">
                           <div class="text-sm font-medium text-gray-900">
-                            {userData.user.displayName}
+                            {userData.user && userData.user.displayName}
                           </div>
                           <a href="#" class="group flex items-center space-x-1">
                             <QCheckBadgeIcon
