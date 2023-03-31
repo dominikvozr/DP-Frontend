@@ -39,19 +39,21 @@ app.use(express.static(distDir, { redirect: false }));
 
 // Use Qwik City's page and endpoint request handler
 //app.use(router);
-if (process.env.BASE_PATH) {
+app.use('/app', router);
+/* if (process.env.BASE_PATH) {
   app.use(process.env.BASE_PATH, router);
 } else {
   app.use(router);
-}
+} */
 
 // Use Qwik City's 404 handler
 // app.use(notFound);
-if (process.env.BASE_PATH) {
+app.use('/app', notFound);
+/* if (process.env.BASE_PATH) {
   app.use(process.env.BASE_PATH, notFound);
 } else {
   app.use(notFound);
-}
+} */
 
 // Start the express server
 app.listen(PORT, () => {
