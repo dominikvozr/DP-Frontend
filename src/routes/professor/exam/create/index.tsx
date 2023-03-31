@@ -2,6 +2,7 @@ import { component$, useStore, $, useSignal, useTask$ } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
 import { ExamApi } from '~/db/ExamApi';
 import { PipelineApi } from '~/db/PipelineApi';
+import { appUrl } from '~/db/url';
 import { Pipeline } from '~/models/Pipeline';
 
 interface ExamData {
@@ -11,7 +12,7 @@ interface ExamData {
 export const onGet: RequestHandler<ExamData> = async ({ response }) => {
   const { pipelines, isAuthorized } = await PipelineApi.getPipelinesData();
   if (!isAuthorized) {
-    throw response.redirect('/login');
+    throw response.redirect(`${appUrl}login`);
   }
   return { pipelines };
 };
@@ -52,7 +53,7 @@ export default component$(() => {
   const handleCreate = $(async () => {
     await ExamApi.createExam(state);
     /* if(response.message === "success")
-        nav.path = '/professor' */
+        nav.path = `${appUrl}professor` */
   });
 
   const recalculatePoints = $(() => {

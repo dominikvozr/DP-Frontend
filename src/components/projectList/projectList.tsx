@@ -2,6 +2,7 @@ import { component$ } from '@builder.io/qwik';
 import { qwikify$ } from '@builder.io/qwik-react';
 import StarIcon from '@heroicons/react/20/solid/StarIcon';
 import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon';
+import { appUrl } from '~/db/url';
 
 export const ProjectList = component$(() => {
   const QChevronRightIcon = qwikify$(ChevronRightIcon);
@@ -55,14 +56,17 @@ export const ProjectList = component$(() => {
                   </span>
 
                   <h2 class="text-sm font-medium">
-                    <a href={project.href}>
+                    <a href={appUrl + project.href}>
                       <span class="absolute inset-0" aria-hidden="true" />
                       {project.name}{' '}
                       <span class="sr-only">{project.active ? 'Running' : 'Not running'}</span>
                     </a>
                   </h2>
                 </div>
-                <a href={project.repoHref} class="group relative flex items-center space-x-2.5">
+                <a
+                  href={appUrl + project.repoHref}
+                  class="group relative flex items-center space-x-2.5"
+                >
                   <svg
                     class="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                     viewBox="0 0 18 18"
@@ -89,7 +93,7 @@ export const ProjectList = component$(() => {
               <div class="hidden flex-shrink-0 flex-col items-end space-y-3 sm:flex">
                 <div class="flex items-center space-x-4">
                   <a
-                    href={project.siteHref}
+                    href={appUrl + project.siteHref}
                     class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
                   >
                     Visit site

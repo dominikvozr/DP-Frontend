@@ -1,6 +1,7 @@
 import { component$, useStylesScoped$, useStore, useSignal, useContext } from '@builder.io/qwik';
 import { useNavigate } from '@builder.io/qwik-city';
 import { UserDataContext } from '~/contexts/contexts';
+import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 import { Logo } from '../logo/logo';
 import styles from './header.css?inline';
@@ -13,12 +14,9 @@ export const Header = component$(() => {
   });
   const nav = useNavigate();
   const navDropdown = useSignal<Element>();
-
-  //const classNames$ = $((...classes: string[]) => classes.filter(Boolean).join(' '));
-
   const navigation = [
-    { name: 'My exams', href: '/professor', current: true },
-    { name: 'Passed tests', href: '/student', current: true },
+    { name: 'My exams', href: 'professor', current: true },
+    { name: 'Passed tests', href: 'student', current: true },
   ];
   const userNavigation = [
     { name: 'Your Profile', href: '#' },
@@ -122,7 +120,7 @@ export const Header = component$(() => {
                 {navigation.map((item) => (
                   <a
                     key={item.name}
-                    href={item.href}
+                    href={appUrl + item.href}
                     class="rounded-md px-3 py-2 text-sm font-medium text-indigo-200 hover:text-white"
                     aria-current={item.current ? 'page' : undefined}
                   >
@@ -189,7 +187,7 @@ export const Header = component$(() => {
                       onClick$={async () => {
                         const data: { message: string } = await UserApi.logout();
                         if (data.message === 'success') {
-                          nav.path = '/login';
+                          nav.path = `${appUrl}login`;
                         }
                       }}
                       class="bg-gray-100 block px-4 py-2 text-sm text-gray-700"
@@ -211,14 +209,14 @@ export const Header = component$(() => {
         <div class="space-y-1 px-2 pt-2 pb-3">
           {/* Current: "text-white bg-indigo-800", Default: "text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600" */}
           <a
-            href="/professor"
+            href={`${appUrl}professor`}
             class="text-white bg-indigo-800 block px-3 py-2 rounded-md text-base font-medium"
             aria-current="page"
           >
             My tests
           </a>
           <a
-            href="/student"
+            href={`${appUrl}student`}
             class="text-indigo-200 hover:text-indigo-100 hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium"
           >
             Passed Exams
@@ -246,7 +244,7 @@ export const Header = component$(() => {
               onClick$={async () => {
                 const data: { message: string } = await UserApi.logout();
                 if (data.message === 'success') {
-                  nav.path = '/login';
+                  nav.path = `${appUrl}login`;
                 }
               }}
               class="block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100"

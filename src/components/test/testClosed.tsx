@@ -1,5 +1,6 @@
 import { component$, useContext } from '@builder.io/qwik';
 import { ExamDataContext } from '~/contexts/contexts';
+import { appUrl } from '~/db/url';
 
 export const TestClosed = component$(() => {
   const examData = useContext(ExamDataContext);
@@ -52,7 +53,10 @@ export const TestClosed = component$(() => {
               </div>
             </div>
             <div class="mt-8">
-              <a href="/student" class="flex text-base font-semibold leading-7 text-indigo-400">
+              <a
+                href={`${appUrl}student`}
+                class="flex text-base font-semibold leading-7 text-indigo-400"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

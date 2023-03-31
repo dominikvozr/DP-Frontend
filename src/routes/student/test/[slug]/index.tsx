@@ -29,10 +29,6 @@ export default component$(() => {
   });
 
   const dataResource = useEndpoint<TestData>();
-  /* const QCheckBadgeIcon = qwikify$(CheckBadgeIcon)
-	const QChevronRightIcon = qwikify$(ChevronRightIcon)
-	const QRectangleStackIcon = qwikify$(RectangleStackIcon)
-	const QStarIcon = qwikify$(StarIcon) */
 
   useTask$(async () => {
     const data = (await dataResource.value) as any;

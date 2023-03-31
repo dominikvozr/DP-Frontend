@@ -3,11 +3,12 @@ import { DocumentHead, RequestHandler, useNavigate } from '@builder.io/qwik-city
 import { User } from '~/models/User';
 import { UserApi } from '~/db/UserApi';
 import { PipelineApi } from '~/db/PipelineApi';
+import { appUrl } from '~/db/url';
 
 export const onGet: RequestHandler<User> = async ({ request, response }) => {
   const { user, isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
   if (!isAuthorized) {
-    throw response.redirect('/login');
+    throw response.redirect(`${appUrl}login`);
   }
   return user;
 };
@@ -33,7 +34,7 @@ export default component$(() => {
 
   const handleCreate = $(async () => {
     const response = await PipelineApi.createPipeline(state);
-    if (response.message === 'success') nav.path = '/professor';
+    if (response.message === 'success') nav.path = `${appUrl}professor`;
   });
 
   //const userResource = useEndpoint<User>();

@@ -18,7 +18,7 @@ export const onGet: RequestHandler<ExamData> = async ({ request, response, param
   const data = await ExamApi.getExamById(params.id, request.headers.get('cookie'));
 
   if (!data || !data.isAuthorized) {
-    throw response.redirect('/login');
+    throw response.redirect(`${appUrl}login`);
   }
   return { exam: data.exam };
 };
@@ -311,7 +311,7 @@ export default component$(() => {
             <nav class="flex justify-between w-full px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
               <div class="flex">
                 <a
-                  href="/professor"
+                  href={`${appUrl}professor`}
                   class="inline-flex items-center space-x-3 text-sm font-medium text-gray-900"
                 >
                   <QChevronLeftIcon className="-ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -326,7 +326,7 @@ export default component$(() => {
                   href="#"
                   preventdefault:click
                   onClick$={() => {
-                    nav.path = '/professor/exam/update' + state.exam._id;
+                    nav.path = `${appUrl}professor/exam/update` + state.exam._id;
                   }}
                 >
                   {/* pencil sqare */}
@@ -351,7 +351,7 @@ export default component$(() => {
                   preventdefault:click
                   onClick$={async () => {
                     const result = await ExamApi.deleteExam(state.exam._id);
-                    if (result.message === 'success') nav.path = '/';
+                    if (result.message === 'success') nav.path = appUrl;
                   }}
                 >
                   {/* trash */}
@@ -463,7 +463,7 @@ export default component$(() => {
                         {tabs.map((tab) => (
                           <a
                             key={tab.name}
-                            href={tab.href}
+                            href={appUrl + tab.href}
                             class={{
                               'border-pink-500 text-gray-900': tab.current,
                               'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300':

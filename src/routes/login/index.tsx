@@ -1,7 +1,7 @@
 import { component$, useClientEffect$ } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, useLocation } from '@builder.io/qwik-city';
 import { Logo } from '~/components/logo/logo';
-import { baseUrl } from '~/db/url';
+import { appUrl, baseUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 
 export const onGet: RequestHandler = async ({ request, response, url }) => {
@@ -9,8 +9,9 @@ export const onGet: RequestHandler = async ({ request, response, url }) => {
 
   if (!data.isAuthorized) return;
 
-  let redirect = '/professor';
-  if (url.searchParams.has('test')) redirect = `/student/test/${url.searchParams.get('test')}`;
+  let redirect = `${appUrl}professor`;
+  if (url.searchParams.has('test'))
+    redirect = `${appUrl}student/test/${url.searchParams.get('test')}`;
 
   if (data.isAuthorized) throw response.redirect(redirect);
 };

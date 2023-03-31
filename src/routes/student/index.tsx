@@ -6,6 +6,7 @@ import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city
 import { TestApi } from '~/db/TestApi';
 import { TestItem } from '~/components/student/TestItem';
 import { UserDataContext } from '~/contexts/contexts';
+import { appUrl } from '~/db/url';
 
 interface StudentData {
   tests: any[];
@@ -21,11 +22,11 @@ interface StudentData {
 
 export const onGet: RequestHandler<StudentData> = async ({ request, response, url }) => {
   const slug = url.searchParams.get('test') ?? '';
-  if (slug !== '') throw response.redirect('/student/test/' + slug);
+  if (slug !== '') throw response.redirect(appUrl + 'student/test/' + slug);
 
   const data = await TestApi.getTests(request.headers.get('cookie'));
   if (!data || !data.isAuthorized) {
-    throw response.redirect('/login');
+    throw response.redirect(`${appUrl}login`);
   }
 
   return { tests: data.tests };

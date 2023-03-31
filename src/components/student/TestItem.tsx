@@ -37,14 +37,17 @@ export const TestItem = component$<TestItemProps>((props) => {
           </span>
 
           <h2 class="text-sm font-medium">
-            <a href={`/professor/test/${props.test._id}`}>
+            <a href={`${appUrl}professor/test/${props.test._id}`}>
               <span class="absolute inset-0" aria-hidden="true" />
               {props.test.exam.name}{' '}
               <span class="sr-only">{props.test.isOpen ? 'Running' : 'Not running'}</span>
             </a>
           </h2>
         </div>
-        <a href={props.test.projectRepo} class="group relative flex items-center space-x-2.5">
+        <a
+          href={appUrl + props.test.projectRepo}
+          class="group relative flex items-center space-x-2.5"
+        >
           <svg
             class="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
             viewBox="0 0 18 18"
