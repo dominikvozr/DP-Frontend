@@ -93,7 +93,7 @@ spec:
       steps {
         container('helm') {
           withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-            sh "helm upgrade fe-chart ./fe-chart -f ./fe-chart/values.yaml --kubeconfig $KUBECONFIG"
+            sh "helm install fe-chart ./fe-chart -f ./fe-chart/values.yaml --kubeconfig $KUBECONFIG"
           }
         }
       }
