@@ -38,8 +38,8 @@ app.use(`/build`, express.static(buildDir, { immutable: true, maxAge: '1y' }));
 app.use(express.static(distDir, { redirect: false }));
 
 // Use Qwik City's page and endpoint request handler
-//app.use(router);
-app.use('/app', router);
+app.use(router);
+// app.use('/app', router);
 /* if (process.env.BASE_PATH) {
   app.use(process.env.BASE_PATH, router);
 } else {
@@ -47,8 +47,8 @@ app.use('/app', router);
 } */
 
 // Use Qwik City's 404 handler
-// app.use(notFound);
-app.use('/app', notFound);
+app.use(notFound);
+// app.use('/app', notFound);
 /* if (process.env.BASE_PATH) {
   app.use(process.env.BASE_PATH, notFound);
 } else {
