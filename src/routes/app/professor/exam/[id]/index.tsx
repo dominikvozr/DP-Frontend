@@ -1,5 +1,5 @@
-import { component$, useContext, useStore, useTask$ } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, useEndpoint, useNavigate } from '@builder.io/qwik-city';
+import { component$, useStore, useTask$ } from '@builder.io/qwik';
+import { DocumentHead, RequestHandler, routeLoader$, useNavigate } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
 import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
 import MagnifyingGlassIcon from '@heroicons/react/20/solid/MagnifyingGlassIcon';
@@ -8,38 +8,41 @@ import { qwikify$ } from '@builder.io/qwik-react';
 import { Exam } from '~/models/Exam';
 import { ExamApi } from '~/db/ExamApi';
 import { appUrl } from '~/db/url';
-import { UserDataContext } from '~/contexts/contexts';
+import { UserApi } from '~/db/UserApi';
 
-interface ExamData {
-  exam: Exam;
-}
-
-export const onGet: RequestHandler<ExamData> = async ({ request, response, params }) => {
-  const data = await ExamApi.getExamById(params.id, request.headers.get('cookie'));
-
-  if (!data || !data.isAuthorized) {
-    throw response.redirect(`${appUrl}login`);
+export const onGet: RequestHandler = async ({ redirect, request }) => {
+  const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
+  if (!isAuthorized) {
+    redirect(302, `${appUrl}login`);
   }
-  return { exam: data.exam };
 };
+
+export const useExamData = routeLoader$(async ({ params, request }) => {
+  const { exam, isAuthorized, user } = await ExamApi.getExamById(
+    params.id,
+    request.headers.get('cookie'),
+  );
+  return { exam, isAuthorized, user };
+});
 
 export default component$(() => {
   const nav = useNavigate();
-  const userData = useContext(UserDataContext);
+  // const userData = useContext(UserDataContext);
 
   const state = useStore({
     exam: {} as any,
     startDate: new Date(),
     endDate: new Date(),
   });
-  const dataResource = useEndpoint<ExamData>();
+  const dataResource = useExamData();
 
   useTask$(async () => {
-    const data = (await dataResource.value) as ExamData;
-    state.exam = data.exam as Exam;
-
-    state.startDate = new Date(data.exam.startDate);
-    state.endDate = new Date(data.exam.endDate);
+    if (!dataResource.value.isAuthorized) {
+      nav(`${appUrl}login`);
+    }
+    state.exam = dataResource.value.exam as Exam;
+    state.startDate = new Date(dataResource.value.exam.startDate);
+    state.endDate = new Date(dataResource.value.exam.endDate);
   });
 
   const QChevronLeftIcon = qwikify$(ChevronLeftIcon);
@@ -326,7 +329,7 @@ export default component$(() => {
                   href="#"
                   preventdefault:click
                   onClick$={() => {
-                    nav.path = `${appUrl}professor/exam/update` + state.exam._id;
+                    nav(`${appUrl}professor/exam/update` + state.exam._id);
                   }}
                 >
                   {/* pencil sqare */}
@@ -351,7 +354,7 @@ export default component$(() => {
                   preventdefault:click
                   onClick$={async () => {
                     const result = await ExamApi.deleteExam(state.exam._id);
-                    if (result.message === 'success') nav.path = appUrl;
+                    if (result.message === 'success') nav(appUrl);
                   }}
                 >
                   {/* trash */}
@@ -413,10 +416,10 @@ export default component$(() => {
                   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
                     <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
                       <div class="flex">
-                        {userData.user && (
+                        {dataResource.value.user && (
                           <img
                             class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                            src={userData.user.avatarUrl}
+                            src={dataResource.value.user.avatarUrl}
                             alt=""
                           />
                         )}

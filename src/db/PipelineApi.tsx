@@ -32,12 +32,13 @@ export class PipelineApi {
     }
   };
 
-  static getPipelinesData = async () => {
+  static getPipelinesData = async (cookies: any) => {
     try {
       const res = await fetch(baseUrl + 'api/v1/pipeline/index', {
         method: 'GET',
         credentials: 'include',
         headers: {
+          Cookie: cookies,
           'content-type': 'application/json',
         },
       });

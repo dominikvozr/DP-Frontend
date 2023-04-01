@@ -1,41 +1,56 @@
-import { component$, useStore, $, useSignal } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, useNavigate } from '@builder.io/qwik-city';
-import { User } from '~/models/User';
-import { UserApi } from '~/db/UserApi';
+import { component$, useStore, useSignal, useTask$ } from '@builder.io/qwik';
+import { DocumentHead, RequestHandler, routeAction$, useNavigate } from '@builder.io/qwik-city';
 import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
+import { UserApi } from '~/db/UserApi';
+import { useUserData } from '~/routes/app/layout';
 
-export const onGet: RequestHandler<User> = async ({ request, response }) => {
-  const { user, isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
+export const onGet: RequestHandler = async ({ redirect, request }) => {
+  const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
   if (!isAuthorized) {
-    throw response.redirect(`${appUrl}login`);
+    throw redirect(302, `${appUrl}login`);
   }
-  return user;
 };
+
+export const useHandleUpload = routeAction$((file: any) => {
+  const data = PipelineApi.uploadPipeline(file);
+  console.log('som-tu');
+  return data;
+});
+
+export const useHandleCreate = routeAction$(
+  async (state: any) => await PipelineApi.createPipeline(state),
+);
 
 export default component$(() => {
   const nav = useNavigate();
-  const state = useStore(
-    {
-      name: '',
-      language: '',
-      type: '',
-      description: '',
-      file: {} as any,
-    },
-    { recursive: true },
-  );
+  const userData = useUserData();
+  const state = useStore({
+    name: '',
+    language: '',
+    type: '',
+    description: '',
+    file: {} as any,
+  });
   const loading = useSignal<boolean>(false);
 
-  const handleUpload = $(async (file: File) => {
-    const data = await PipelineApi.uploadPipeline(file);
-    state.file = data;
+  useTask$(() => {
+    if (!userData.value.isAuthorized) {
+      nav(`${appUrl}login`);
+    }
   });
 
-  const handleCreate = $(async () => {
+  /* const handleUpload = useHandleUpload();
+  const handleCreate = useHandleCreate(); */
+  /* const handleUpload = $(async (file: File) => {
+    const data = await PipelineApi.uploadPipeline(file);
+    state.file = data;
+  }); */
+
+  /* const handleCreate = $(async () => {
     const response = await PipelineApi.createPipeline(state);
-    if (response.message === 'success') nav.path = `${appUrl}professor`;
-  });
+    if (response.message === 'success') nav(`${appUrl}professor`);
+  }); */
 
   //const userResource = useEndpoint<User>();
   return (
@@ -150,8 +165,12 @@ export default component$(() => {
                               <input
                                 id="file-upload"
                                 name="pipeline"
-                                onChange$={(ev: any) => {
-                                  handleUpload(ev.target.files[0]);
+                                onChange$={async (ev: any) => {
+                                  /* const { value } = await handleUpload.run(ev.target.files[0]); */
+                                  const data = await PipelineApi.uploadPipeline(ev.target.files[0]);
+                                  state.file = data;
+                                  console.log(data);
+                                  // handleUpload(ev.target.files[0]);
                                 }}
                                 type="file"
                                 class="sr-only"
@@ -165,7 +184,14 @@ export default component$(() => {
                         type="submit"
                         disabled={loading.value}
                         preventdefault:click
-                        onClick$={handleCreate}
+                        onClick$={async () => {
+                          //const { value } = await handleCreate.run(state);
+                          //console.log(value);
+                          const response = await PipelineApi.createPipeline(state);
+                          if (response.message === 'success') nav(`${appUrl}professor`);
+                          // if (response.message === 'success') nav(`${appUrl}professor`);
+                          // handleUpload(ev.target.files[0]);
+                        }}
                         class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                       >
                         Uložiť pipelinu

@@ -1,30 +1,33 @@
-import { component$, useClientEffect$ } from '@builder.io/qwik';
+import { component$, useTask$ } from '@builder.io/qwik';
+import { isBrowser } from '@builder.io/qwik/build';
 import { DocumentHead, RequestHandler, useLocation } from '@builder.io/qwik-city';
 import { Logo } from '~/components/logo/logo';
 import { appUrl, baseUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 
-export const onGet: RequestHandler = async ({ request, response, url }) => {
+export const onGet: RequestHandler = async ({ request, redirect, url }) => {
   const data = await UserApi.checkAuthorization(request.headers.get('cookie'));
 
   if (!data.isAuthorized) return;
 
-  let redirect = `${appUrl}professor`;
+  let redirectPath = `${appUrl}professor`;
   if (url.searchParams.has('test'))
-    redirect = `${appUrl}student/test/${url.searchParams.get('test')}`;
+    redirectPath = `${appUrl}student/test/${url.searchParams.get('test')}`;
 
-  if (data.isAuthorized) throw response.redirect(redirect);
+  if (data.isAuthorized) throw redirect(302, redirectPath);
 };
 
 export default component$(() => {
   const loc = useLocation();
 
-  useClientEffect$(() => {
-    if (loc.query.test && loc.query.test != 'null') {
-      if (loc.query.test.includes('/')) {
-        localStorage.setItem('test', loc.query.test.split('/')[0]);
-      } else {
-        localStorage.setItem('test', loc.query.test);
+  useTask$(() => {
+    if (isBrowser) {
+      if (loc.url.searchParams.get('test') && loc.url.searchParams.get('test') != 'null') {
+        if (loc.url.searchParams.get('test')?.includes('/')) {
+          localStorage.setItem('test', loc.url.searchParams.get('test')!.split('/')[0]);
+        } else {
+          localStorage.setItem('test', loc.url.searchParams.get('test')!);
+        }
       }
     }
   });

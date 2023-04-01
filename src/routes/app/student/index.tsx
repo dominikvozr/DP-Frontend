@@ -1,53 +1,32 @@
 import { qwikify$ } from '@builder.io/qwik-react';
-import { component$, useContext, useStore, useTask$ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon';
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon';
-import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
+import { DocumentHead, RequestHandler, routeLoader$ } from '@builder.io/qwik-city';
 import { TestApi } from '~/db/TestApi';
 import { TestItem } from '~/components/student/TestItem';
-import { UserDataContext } from '~/contexts/contexts';
 import { appUrl } from '~/db/url';
+import { UserApi } from '~/db/UserApi';
 
-interface StudentData {
-  tests: any[];
-}
-
-/* export const onGet: RequestHandler<User> = async ({ request, response }) => {
-	const {user, isAuthorized} = await UserApi.checkAuthorization(request.headers.get('cookie'))
-	if (!isAuthorized) {
-		throw response.redirect('/login')
-	}
-  return user
-}; */
-
-export const onGet: RequestHandler<StudentData> = async ({ request, response, url }) => {
-  const slug = url.searchParams.get('test') ?? '';
-  if (slug !== '') throw response.redirect(appUrl + 'student/test/' + slug);
-
+export const useTestsData = routeLoader$(async ({ request }) => {
   const data = await TestApi.getTests(request.headers.get('cookie'));
-  if (!data || !data.isAuthorized) {
-    throw response.redirect(`${appUrl}login`);
-  }
+  return { tests: data?.tests, user: data?.user, isAuthorized: data?.isAuthorized };
+});
 
-  return { tests: data.tests, user: data.user };
+export const onGet: RequestHandler = async ({ request, redirect, url }) => {
+  const slug = url.searchParams.get('test') ?? '';
+  if (slug !== '') throw redirect(302, appUrl + 'student/test/' + slug);
+
+  const data = await UserApi.checkAuthorization(request.headers.get('cookie'));
+  if (!data || !data.isAuthorized) {
+    throw redirect(302, `${appUrl}login`);
+  }
 };
 
 export default component$(() => {
-  const state = useStore({
-    tests: [] as any[],
-  });
-
-  const dataResource = useEndpoint<any>();
+  const dataResource = useTestsData();
   const QCheckBadgeIcon = qwikify$(CheckBadgeIcon);
   const QRectangleStackIcon = qwikify$(RectangleStackIcon);
-  const userData = useContext(UserDataContext);
-
-  useTask$(async () => {
-    const data = (await dataResource.value) as any;
-    state.tests = data.tests;
-    userData.user = data.user;
-  });
-
   const activityItems = [
     { project: 'Workcation', commit: '2d89f0c8', environment: 'production', time: '1h' },
   ];
@@ -68,17 +47,17 @@ export default component$(() => {
                       {/* Profile */}
                       <div class="flex items-center space-x-3">
                         <div class="h-12 w-12 flex-shrink-0">
-                          {userData.user && (
+                          {dataResource.value.user && (
                             <img
                               class="h-12 w-12 rounded-full"
-                              src={userData.user.avatarUrl}
+                              src={dataResource.value.user.avatarUrl}
                               alt="avatar"
                             />
                           )}
                         </div>
                         <div class="space-y-1">
                           <div class="text-sm font-medium text-gray-900">
-                            {userData.user && userData.user.displayName}
+                            {dataResource.value.user && dataResource.value.user.displayName}
                           </div>
                           <a href="#" class="group flex items-center space-x-1">
                             <QCheckBadgeIcon
@@ -97,7 +76,7 @@ export default component$(() => {
                       <div class="flex items-center space-x-2">
                         <QRectangleStackIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span class="text-sm font-medium text-gray-500">
-                          Testov: {state.tests.length}
+                          Testov: {dataResource.value.tests.length}
                         </span>
                       </div>
                     </div>
@@ -114,7 +93,9 @@ export default component$(() => {
                 </div>
               </div>
               <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
-                {state.tests && state.tests.map((test) => <TestItem test={test} />)}
+                {dataResource.value.tests?.map((test: any) => (
+                  <TestItem test={test} />
+                ))}
               </ul>
             </div>
           </div>

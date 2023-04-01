@@ -1,36 +1,32 @@
 import { component$, Slot, useContextProvider, useStore, useTask$ } from '@builder.io/qwik';
-import { RequestHandler, useEndpoint } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
 import { Header } from '~/components/header/header';
+import { UserDataContext } from '~/contexts/contexts';
 import { UserApi } from '~/db/UserApi';
 import { User } from '~/models/User';
 
-interface UserData {
-  user: User;
-}
-
-export const onGet: RequestHandler<UserData> = async ({ request }) => {
+export const useUserData = routeLoader$(async ({ request }) => {
   const data = await UserApi.checkAuthorization(request.headers.get('cookie'));
-  if (data && data.isAuthorized) {
-    return { user: data.user };
+  if (data.isAuthorized) {
+    return { user: data.user, isAuthorized: true };
   }
-};
+  return { isAuthorized: false };
+});
 
 export default component$(() => {
   const state = useStore({
     user: {} as any,
   });
-  const userResource = useEndpoint<UserData>();
-
+  const userData = useUserData();
   useTask$(async () => {
-    const data = (await userResource.value) as UserData;
-    if (!data) return;
-    state.user = data.user as User;
+    if (!userData.value) return;
+    state.user = userData.value.user as User;
   });
 
   useContextProvider(UserDataContext, state);
   return (
     <>
-      <Header />
+      <Header user={state.user} />
       <Slot />
       <footer class="bg-indigo-50">
         <div class="mx-auto max-w-7xl overflow-hidden py-10 px-6 sm:py-12 lg:px-8">

@@ -40,3 +40,4 @@ lerna-debug.log*
 
 # urls
 /src/db/url.tsx
+src/db/url.tsx

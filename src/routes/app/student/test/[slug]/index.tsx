@@ -1,15 +1,13 @@
 import { component$, useContextProvider, useStore, useTask$ } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
-import { Test } from '~/models/Test';
+import { DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import { TestApi } from '~/db/TestApi';
-import { Exam } from '~/models/Exam';
 import _ from 'lodash';
 import { TestClosed } from '~/components/test/testClosed';
 import { TestInvitation } from '~/components/test/testInvitation';
 import { TestShow } from '~/components/test/testShow';
 import { ExamDataContext, TestDataContext } from '~/contexts/contexts';
 
-interface TestData {
+/* interface TestData {
   test: Test;
   exam: Exam;
 }
@@ -17,7 +15,12 @@ interface TestData {
 export const onGet: RequestHandler<TestData> = async ({ request, params }) => {
   const data = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
   return { test: data.test, exam: data.exam };
-};
+}; */
+
+export const useTestData = routeLoader$(async ({ request, params }) => {
+  const data = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
+  return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
+});
 
 export default component$(() => {
   const examState = useStore({
@@ -28,12 +31,11 @@ export default component$(() => {
     test: {} as any,
   });
 
-  const dataResource = useEndpoint<TestData>();
+  const dataResource = useTestData();
 
   useTask$(async () => {
-    const data = (await dataResource.value) as any;
-    testState.test = data.test;
-    examState.exam = data.exam;
+    testState.test = dataResource.value.test;
+    examState.exam = dataResource.value.exam;
   });
 
   useContextProvider(ExamDataContext, examState);

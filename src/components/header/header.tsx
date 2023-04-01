@@ -1,14 +1,17 @@
-import { component$, useStylesScoped$, useStore, useSignal, useContext } from '@builder.io/qwik';
+import { component$, useStylesScoped$, useStore, useSignal } from '@builder.io/qwik';
 import { useNavigate } from '@builder.io/qwik-city';
-import { UserDataContext } from '~/contexts/contexts';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
+import { User } from '~/models/User';
 import { Logo } from '../logo/logo';
 import styles from './header.css?inline';
 
-export const Header = component$(() => {
+export interface HeaderProps {
+  user: User | null;
+}
+
+export const Header = component$<HeaderProps>((props) => {
   useStylesScoped$(styles);
-  const userData = useContext(UserDataContext);
   const state = useStore({
     showNavDropdown: false,
   });
@@ -150,12 +153,8 @@ export const Header = component$(() => {
                     aria-haspopup="true"
                   >
                     <span class="sr-only">Open user menu</span>
-                    {userData.user && (
-                      <img
-                        class="h-8 w-8 rounded-full"
-                        src={userData.user.avatarUrl}
-                        alt="avatar"
-                      />
+                    {props.user && (
+                      <img class="h-8 w-8 rounded-full" src={props.user.avatarUrl} alt="avatar" />
                     )}
                   </button>
                 </div>
@@ -187,7 +186,7 @@ export const Header = component$(() => {
                       onClick$={async () => {
                         const data: { message: string } = await UserApi.logout();
                         if (data.message === 'success') {
-                          nav.path = `${appUrl}login`;
+                          nav(`${appUrl}login`);
                         }
                       }}
                       class="bg-gray-100 block px-4 py-2 text-sm text-gray-700"
@@ -244,7 +243,7 @@ export const Header = component$(() => {
               onClick$={async () => {
                 const data: { message: string } = await UserApi.logout();
                 if (data.message === 'success') {
-                  nav.path = `${appUrl}login`;
+                  nav(`${appUrl}login`);
                 }
               }}
               class="block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100"

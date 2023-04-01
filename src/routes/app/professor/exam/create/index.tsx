@@ -1,47 +1,58 @@
 import { component$, useStore, $, useSignal, useTask$ } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
+import {
+  DocumentHead,
+  RequestHandler,
+  routeAction$,
+  routeLoader$,
+  useNavigate,
+} from '@builder.io/qwik-city';
 import _ from 'lodash';
 import { ExamApi } from '~/db/ExamApi';
 import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
+import { UserApi } from '~/db/UserApi';
 import { Pipeline } from '~/models/Pipeline';
 
-interface ExamData {
-  pipelines: Pipeline[];
-}
-
-export const onGet: RequestHandler<ExamData> = async ({ response }) => {
-  const { pipelines, isAuthorized } = await PipelineApi.getPipelinesData();
+export const onGet: RequestHandler = async ({ redirect, request }) => {
+  const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
   if (!isAuthorized) {
-    throw response.redirect(`${appUrl}login`);
+    redirect(302, `${appUrl}login`);
   }
-  return { pipelines };
 };
 
-export default component$(() => {
-  const store = useStore({
-    pipelines: [] as any[],
-  });
-  const state = useStore(
-    {
-      name: '',
-      description: '',
-      subject: '',
-      startDate: '',
-      endDate: '',
-      project: {} as any,
-      exams: [] as any,
-      examsFile: {} as any,
-      pipeline: '',
-      templateId: 0,
-      points: 0,
-    },
-    { recursive: true },
+export const usePipelinesData = routeLoader$(async ({ request }) => {
+  const { pipelines, isAuthorized } = await PipelineApi.getPipelinesData(
+    request.headers.get('cookie'),
   );
+  return { pipelines, isAuthorized };
+});
+
+/* export const useHandleUpload = routeAction$(
+  async (destination: string, file: any) => await ExamApi.uploadExamProject(destination, file),
+);*/
+
+export const useHandleCreate = routeAction$(async (state: any) => await ExamApi.createExam(state));
+
+export default component$(() => {
+  const nav = useNavigate();
+  const state = useStore({
+    name: '',
+    description: '',
+    subject: '',
+    startDate: '',
+    endDate: '',
+    project: {} as any,
+    exams: [] as any,
+    examsFile: {} as any,
+    pipeline: '',
+    templateId: 0,
+    points: 0,
+  });
 
   const loading = useSignal<boolean>(false);
 
-  const handleUpload = $(async (destination: string, file: File) => {
+  // const handleUpload = useHandleUpload();
+  /* $(async (destination: string, file: File) => {
     const data = await ExamApi.uploadExamProject(destination, file);
     if (destination === 'project') {
       state.project = data;
@@ -49,24 +60,28 @@ export default component$(() => {
       state.exams = data.matches;
       state.examsFile = data.file;
     }
-  });
+  }); */
 
-  const handleCreate = $(async () => {
+  // const handleCreate = useHandleCreate();
+  /* $(async () => {
     await ExamApi.createExam(state);
-    /* if(response.message === "success")
-        nav.path = `${appUrl}professor` */
-  });
+    if(response.message === "success")
+        nav.path = `${appUrl}professor`
+  }); */
 
   const recalculatePoints = $(() => {
     state.points = state.exams.reduce((acc: any, obj: any) => acc + obj.points, 0) || 0;
   });
 
-  const examResource = useEndpoint<ExamData>();
+  const pipelinesData = usePipelinesData();
 
   useTask$(async () => {
-    const data = await examResource.value;
-    store.pipelines = data.pipelines;
-    state.pipeline = !_.isEmpty(data.pipelines) ? data.pipelines[0]._id : '';
+    if (!pipelinesData.value.isAuthorized) {
+      nav(`${appUrl}login`);
+    }
+    state.pipeline = !_.isEmpty(pipelinesData.value.pipelines)
+      ? pipelinesData.value.pipelines[0]._id
+      : '';
   });
 
   return (
@@ -211,9 +226,23 @@ export default component$(() => {
                                     id="file-upload"
                                     name="project"
                                     accept=".zip"
-                                    onChange$={(ev: any) => {
-                                      handleUpload('project', ev.target.files[0]);
+                                    onChange$={async (ev: any) => {
+                                      /* const { value } = await handleUpload.run(
+                                        'project',
+                                        ev.target.files[0],
+                                      );
+                                      state.project = value;
+                                      console.log(value); */
+                                      const data = await ExamApi.uploadExamProject(
+                                        'project',
+                                        ev.target.files[0],
+                                      );
+                                      state.project = data;
+                                      // handleUpload(ev.target.files[0]);
                                     }}
+                                    /* onChange$={(ev: any) => {
+                                      handleUpload('project', ev.target.files[0]);
+                                    }} */
                                     type="file"
                                     class="sr-only"
                                   />
@@ -251,8 +280,18 @@ export default component$(() => {
                                   <input
                                     id="tests"
                                     name="tests"
-                                    onInput$={(ev: any) => {
-                                      handleUpload('tests', ev.target.files[0]);
+                                    onInput$={async (ev: any) => {
+                                      /* const { value } = await handleUpload.run(
+                                        'tests',
+                                        ev.target.files[0],
+                                      ); */
+                                      const data = await ExamApi.uploadExamProject(
+                                        'tests',
+                                        ev.target.files[0],
+                                      );
+                                      state.exams = data.matches;
+                                      state.examsFile = data.file;
+                                      // handleUpload(ev.target.files[0]);
                                     }}
                                     type="file"
                                     class="sr-only"
@@ -308,9 +347,10 @@ export default component$(() => {
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
                             {state.pipeline}
-                            {store.pipelines.map((pipeline: Pipeline) => {
+                            {pipelinesData.value.pipelines?.map((pipeline: Pipeline) => {
                               return (
                                 <option
+                                  key={pipeline ? pipeline._id : ''}
                                   value={pipeline ? pipeline._id : ''}
                                   selected={pipeline && state.pipeline === pipeline._id}
                                 >
@@ -376,9 +416,9 @@ export default component$(() => {
                   <div class="mt-5 md:col-span-2 md:mt-0">
                     <div class="overflow-hidden shadow sm:rounded-md">
                       <div class="bg-white px-4 py-5 sm:p-6">
-                        {state.exams.map((exam: any) => {
+                        {state.exams?.map((exam: any) => {
                           return (
-                            <div class="flex align-middle justify-between space-x-4">
+                            <div key={exam._id} class="flex align-middle justify-between space-x-4">
                               <label
                                 for="name"
                                 class="block text-sm w-72 font-medium text-gray-700 self-center text-md tracking-wider"
@@ -405,7 +445,11 @@ export default component$(() => {
                         <button
                           type="submit"
                           disabled={loading.value}
-                          onClick$={handleCreate}
+                          onClick$={async () => {
+                            //const { value } = await handleCreate.run(state);
+                            const res = await ExamApi.createExam(state);
+                            if (res.message === 'success') nav(`${appUrl}professor`);
+                          }}
                           class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                           Uložiť test

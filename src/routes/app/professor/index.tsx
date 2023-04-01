@@ -1,57 +1,37 @@
 import { qwikify$ } from '@builder.io/qwik-react';
-import { component$, useTask$, useStore } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon';
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon';
-import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
-import { User } from '~/models/User';
+import { DocumentHead, RequestHandler, routeLoader$ } from '@builder.io/qwik-city';
 import { ExamApi } from '~/db/ExamApi';
 import { Exam } from '~/models/Exam';
 import { ExamItem } from '~/components/professor/ExamItem';
 import { Pagination } from '~/components/pagination/pagination';
 import { appUrl } from '~/db/url';
+import { UserApi } from '~/db/UserApi';
 
-interface ProfessorData {
-  user: User;
-  exams: Exam[];
-  examsCount: number;
-  page: number;
-}
-
-export const onGet: RequestHandler<ProfessorData> = async ({ request, response, url }) => {
-  const page = url.searchParams.get('page') ?? '';
-  const data = await ExamApi.getExams(request.headers.get('cookie'), page);
+export const onGet: RequestHandler = async ({ request, redirect }) => {
+  const data = await UserApi.checkAuthorization(request.headers.get('cookie'));
   if (!data || !data.isAuthorized) {
-    throw response.redirect(`${appUrl}login`);
+    throw redirect(302, `${appUrl}login`);
   }
-  return {
-    user: data.user,
-    exams: data.data.exams,
-    examsCount: data.data.examsCount,
-    page: parseInt(page),
-  };
 };
 
+export const useTestData = routeLoader$(async ({ request, params }) => {
+  const data = await ExamApi.getExams(request.headers.get('cookie'), params.page);
+  return {
+    user: data.user,
+    exams: data.exams,
+    isAuthorized: data.isAuthorized,
+    examsCount: data.examsCount,
+    page: parseInt(params.page),
+  };
+});
+
 export default component$(() => {
-  const state = useStore({
-    user: {} as any,
-    exams: [] as any[],
-    examsNum: 0,
-    page: 0,
-  });
-  const dataResource = useEndpoint<ProfessorData>();
+  const dataResource = useTestData();
   const QCheckBadgeIcon = qwikify$(CheckBadgeIcon);
   const QRectangleStackIcon = qwikify$(RectangleStackIcon);
-
-  useTask$(async () => {
-    const data = (await dataResource.value) as ProfessorData;
-    if (!data) return;
-
-    state.user = data.user as User;
-    state.exams = data.exams as Array<Exam>;
-    state.examsNum = data.examsCount;
-    state.page = data.page;
-  });
-
   const activityItems = [
     { project: 'Workcation', commit: '2d89f0c8', environment: 'production', time: '1h' },
   ];
@@ -72,17 +52,17 @@ export default component$(() => {
                       {/* Profile */}
                       <div class="flex items-center space-x-3">
                         <div class="h-12 w-12 flex-shrink-0">
-                          {state.user && (
+                          {dataResource.value.user && (
                             <img
                               class="h-12 w-12 rounded-full"
-                              src={state.user.avatarUrl}
+                              src={dataResource.value.user.avatarUrl}
                               alt="avatar"
                             />
                           )}
                         </div>
                         <div class="space-y-1">
                           <div class="text-sm font-medium text-gray-900">
-                            {state.user.displayName}
+                            {dataResource.value.user.displayName}
                           </div>
                           <a href="#" class="group flex items-center space-x-1">
                             <QCheckBadgeIcon
@@ -122,7 +102,7 @@ export default component$(() => {
                       <div class="flex items-center space-x-2">
                         <QRectangleStackIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span class="text-sm font-medium text-gray-500">
-                          Tests: {state.examsNum}
+                          Tests: {dataResource.value.examsCount}
                         </span>
                       </div>
                     </div>
@@ -139,7 +119,7 @@ export default component$(() => {
                 </div>
               </div>
               <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
-                {state.exams.map((exam: Exam) => (
+                {dataResource.value.exams?.map((exam: Exam) => (
                   <li
                     key={exam._id}
                     class="relative py-5 pl-4 pr-6 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6"
@@ -190,7 +170,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="pt-2 pb-4 mx-4">
-          <Pagination count={state.examsNum} active={state.page} />
+          <Pagination count={dataResource.value.examsCount} active={dataResource.value.page} />
         </div>
       </div>
     </>
