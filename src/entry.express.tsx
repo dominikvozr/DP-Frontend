@@ -22,7 +22,7 @@ declare global {
 import compression from 'compression';
 
 // Directories where the static assets are located
-const distDir = join(fileURLToPath(import.meta.url), '..', '..', 'dist');
+const distDir = join(fileURLToPath(import.meta.url), 'app', '..', '..', 'dist');
 const buildDir = join(distDir, 'build');
 
 // Allow for dynamic port
