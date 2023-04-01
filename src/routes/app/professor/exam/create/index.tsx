@@ -1,5 +1,6 @@
 import { component$, useStore, $, useSignal, useTask$ } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, useEndpoint } from '@builder.io/qwik-city';
+import _ from 'lodash';
 import { ExamApi } from '~/db/ExamApi';
 import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
@@ -65,7 +66,7 @@ export default component$(() => {
   useTask$(async () => {
     const data = await examResource.value;
     store.pipelines = data.pipelines;
-    state.pipeline = data.pipelines ? data.pipelines[0]._id : '';
+    state.pipeline = !_.isEmpty(data.pipelines) ? data.pipelines[0]._id : '';
   });
 
   return (
