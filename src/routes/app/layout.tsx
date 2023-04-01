@@ -1,7 +1,6 @@
 import { component$, Slot, useContextProvider, useStore, useTask$ } from '@builder.io/qwik';
 import { RequestHandler, useEndpoint } from '@builder.io/qwik-city';
 import { Header } from '~/components/header/header';
-import { UserDataContext } from '~/contexts/contexts';
 import { UserApi } from '~/db/UserApi';
 import { User } from '~/models/User';
 
