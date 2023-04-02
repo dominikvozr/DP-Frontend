@@ -4,7 +4,7 @@ import baseConfig from '../../vite.config';
 
 export default extendConfig(baseConfig, () => {
   return {
-    base: `${process.env.BASE_PATH}/`,
+    base: `/app/`,
     build: {
       ssr: true,
       rollupOptions: {
