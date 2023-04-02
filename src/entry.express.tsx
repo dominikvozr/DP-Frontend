@@ -35,16 +35,15 @@ const { router, notFound } = createQwikCity({ render, qwikCityPlan, manifest });
 // https://expressjs.com/
 const app = express();
 
+// /app => /app/
 function ensureTrailingSlash(req: any, res: any, next: any) {
   const path = req.path;
-  if (path !== '/' && !path.endsWith('/')) {
+  if (path === '/app') {
     res.redirect(301, `${path}/`);
   } else {
     next();
   }
 }
-
-// Add the middleware to your Express app
 app.use(ensureTrailingSlash);
 
 // Enable gzip compression
