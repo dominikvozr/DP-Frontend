@@ -14,7 +14,6 @@ export const onGet: RequestHandler = async ({ redirect, request }) => {
 
 export const useHandleUpload = routeAction$((file: any) => {
   const data = PipelineApi.uploadPipeline(file);
-  console.log('som-tu');
   return data;
 });
 
@@ -169,7 +168,6 @@ export default component$(() => {
                                   /* const { value } = await handleUpload.run(ev.target.files[0]); */
                                   const data = await PipelineApi.uploadPipeline(ev.target.files[0]);
                                   state.file = data;
-                                  console.log(data);
                                   // handleUpload(ev.target.files[0]);
                                 }}
                                 type="file"
@@ -186,7 +184,6 @@ export default component$(() => {
                         preventdefault:click
                         onClick$={async () => {
                           //const { value } = await handleCreate.run(state);
-                          //console.log(value);
                           const response = await PipelineApi.createPipeline(state);
                           if (response.message === 'success') nav(`${appUrl}professor`);
                           // if (response.message === 'success') nav(`${appUrl}professor`);

@@ -1,8 +1,6 @@
-import { component$, useTask$ } from '@builder.io/qwik';
-import { isServer } from '@builder.io/qwik/build';
-import { DocumentHead, RequestHandler, routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import { component$ } from '@builder.io/qwik';
+import { DocumentHead, RequestHandler } from '@builder.io/qwik-city';
 import { appUrl } from '~/db/url';
-import { useUserData } from './layout';
 import { UserApi } from '~/db/UserApi';
 
 export const onGet: RequestHandler = async ({ url, request, redirect }) => {
@@ -13,27 +11,7 @@ export const onGet: RequestHandler = async ({ url, request, redirect }) => {
   else redirect(302, `${appUrl}professor`);
 };
 
-export const useStudentData = routeLoader$(async ({ params }) => {
-  /* if (url.searchParams.has('test'))
-    throw response.redirect(`${appUrl}student?test=${url.searchParams.get('test')}`);
-  else throw response.redirect(`${appUrl}professor`); */
-  console.log(params);
-  return { params };
-});
-
 export default component$(() => {
-  const userData = useUserData();
-  const studentData = useStudentData();
-  const useNav = useNavigate();
-  useTask$(() => {
-    if (isServer) {
-      if (!userData.value.isAuthorized) {
-        useNav(`${appUrl}login`);
-      }
-      console.log(studentData.value.params);
-    }
-  });
-
   return <>:)</>;
 });
 

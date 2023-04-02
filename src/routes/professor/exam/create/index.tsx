@@ -227,22 +227,12 @@ export default component$(() => {
                                     name="project"
                                     accept=".zip"
                                     onChange$={async (ev: any) => {
-                                      /* const { value } = await handleUpload.run(
-                                        'project',
-                                        ev.target.files[0],
-                                      );
-                                      state.project = value;
-                                      console.log(value); */
                                       const data = await ExamApi.uploadExamProject(
                                         'project',
                                         ev.target.files[0],
                                       );
                                       state.project = data;
-                                      // handleUpload(ev.target.files[0]);
                                     }}
-                                    /* onChange$={(ev: any) => {
-                                      handleUpload('project', ev.target.files[0]);
-                                    }} */
                                     type="file"
                                     class="sr-only"
                                   />
