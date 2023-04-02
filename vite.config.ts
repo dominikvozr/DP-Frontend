@@ -8,7 +8,7 @@ import { qwikReact } from "@builder.io/qwik-react/vite";
 
 export default defineConfig(() => {
   return {
-    basePathname: '/app/',
+    basePathname: `${process.env.BASE_PATH}/`,
     plugins: [
       qwikCity(),
       qwikVite(),
