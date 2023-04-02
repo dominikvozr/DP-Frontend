@@ -22,7 +22,7 @@ declare global {
 import compression from 'compression';
 
 // Directories where the static assets are located
-const distDir = join(fileURLToPath(import.meta.url), 'app', '..', '..', 'dist');
+const distDir = join(fileURLToPath(import.meta.url), '..', '..', 'dist');
 const buildDir = join(distDir, 'build');
 
 // Allow for dynamic port
@@ -40,14 +40,14 @@ app.use(compression());
 
 // Static asset handlers
 // https://expressjs.com/en/starter/static-files.html
-app.use(`/app/build`, express.static(buildDir, { immutable: true, maxAge: '1y' }));
-app.use('/app', express.static(distDir, { redirect: false }));
+app.use(`/build`, express.static(buildDir, { immutable: true, maxAge: '1y' }));
+app.use(express.static(distDir, { redirect: false }));
 
 // Use Qwik City's page and endpoint request handler
-app.use('/app', router);
+app.use(router);
 
 // Use Qwik City's 404 handler
-app.use('/app', notFound);
+app.use(notFound);
 
 // Start the express server
 app.listen(PORT, () => {

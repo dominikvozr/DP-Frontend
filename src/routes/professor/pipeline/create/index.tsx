@@ -3,7 +3,7 @@ import { DocumentHead, RequestHandler, routeAction$, useNavigate } from '@builde
 import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
-import { useUserData } from '~/routes/app/layout';
+import { useUserData } from '~/routes/layout';
 
 export const onGet: RequestHandler = async ({ redirect, request }) => {
   const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
