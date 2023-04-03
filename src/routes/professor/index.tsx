@@ -21,9 +21,9 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
   const data = await ExamApi.getExams(request.headers.get('cookie'), params.page);
   return {
     user: data.user,
-    exams: data.exams,
+    exams: data.data.exams,
     isAuthorized: data.isAuthorized,
-    examsCount: data.examsCount,
+    examsCount: data.data.examsCount,
     page: parseInt(params.page),
   };
 });
