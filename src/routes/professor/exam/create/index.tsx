@@ -42,8 +42,8 @@ export default component$(() => {
     startDate: '',
     endDate: '',
     project: {} as any,
-    exams: [] as any,
-    examsFile: {} as any,
+    tests: [] as any,
+    testsFile: {} as any,
     pipeline: '',
     templateId: 0,
     points: 0,
@@ -70,7 +70,7 @@ export default component$(() => {
   }); */
 
   const recalculatePoints = $(() => {
-    state.points = state.exams.reduce((acc: any, obj: any) => acc + obj.points, 0) || 0;
+    state.points = state.tests.reduce((acc: any, obj: any) => acc + obj.points, 0) || 0;
   });
 
   const pipelinesData = usePipelinesData();
@@ -266,7 +266,7 @@ export default component$(() => {
                                   class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                                 >
                                   <span>Nahraj testy</span>
-                                  <div>{state.exams && `${state.examsFile.name}`}</div>
+                                  <div>{state.tests && `${state.testsFile.name}`}</div>
                                   <input
                                     id="tests"
                                     name="tests"
@@ -279,8 +279,8 @@ export default component$(() => {
                                         'tests',
                                         ev.target.files[0],
                                       );
-                                      state.exams = data.matches;
-                                      state.examsFile = data.file;
+                                      state.tests = data.matches;
+                                      state.testsFile = data.file;
                                       // handleUpload(ev.target.files[0]);
                                     }}
                                     type="file"
@@ -386,7 +386,7 @@ export default component$(() => {
             </div>
           </div>
 
-          {state.exams.length ? (
+          {state.tests.length ? (
             <>
               <div class="hidden sm:block" aria-hidden="true">
                 <div class="py-5">
@@ -406,7 +406,7 @@ export default component$(() => {
                   <div class="mt-5 md:col-span-2 md:mt-0">
                     <div class="overflow-hidden shadow sm:rounded-md">
                       <div class="bg-white px-4 py-5 sm:p-6">
-                        {state.exams?.map((exam: any) => {
+                        {state.tests?.map((exam: any) => {
                           return (
                             <div key={exam._id} class="flex align-middle justify-between space-x-4">
                               <label
@@ -421,7 +421,7 @@ export default component$(() => {
                                 name="name"
                                 id="name"
                                 onInput$={(ev: any) => {
-                                  state.exams[exam.id - 1].points = parseFloat(ev.target.value);
+                                  state.tests[exam.id - 1].points = parseFloat(ev.target.value);
                                   recalculatePoints();
                                 }}
                                 class="mt-1 block w-24 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

@@ -85,7 +85,6 @@ spec:
     stage('Update Helm Chart Values') {
       steps {
         sh "sed -i \"s|tag: latest|tag: ${env.IMAGE_TAG}|\" ./fe-chart/values.yaml"
-        sh "cat ./fe-chart/values.yaml" // This line will print the contents of the values.yaml file
       }
     }
 
