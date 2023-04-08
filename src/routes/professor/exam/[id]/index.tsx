@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { component$, useStore, useTask$, $, useSignal, useContextProvider } from '@builder.io/qwik';
+import { component$, useStore, useTask$, $, useContextProvider } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, routeLoader$, useNavigate } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
 import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
@@ -14,7 +14,7 @@ import { ExamModal } from '~/components/exam/modal';
 import { ExamModalDataContext } from '~/contexts/contexts';
 
 interface Score {
-    tests: []
+    tests: any
     points: number,
     message: string,
     percentage: number,
@@ -98,7 +98,7 @@ export default component$(() => {
                   href={`${appUrl}professor`}
                   class="inline-flex items-center space-x-3 text-sm font-medium text-gray-900"
                 >
-                  <QChevronLeftIcon class="-ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <QChevronLeftIcon className="-ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 </a>
                 <h1 class="truncate self-center ml-5 text-2xl text-center font-bold text-indigo-200">
                   {dataResource.value.exam.name} - {dataResource.value.exam.subject}
@@ -229,7 +229,7 @@ export default component$(() => {
                                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                               >
                                 <QEnvelopeIcon
-                                  class="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
                                   aria-hidden="true"
                                 />
                                 <span>Message</span>
@@ -239,7 +239,7 @@ export default component$(() => {
                                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                               >
                                 <QCommandLineIcon
-                                  class="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
                                   aria-hidden="true"
                                 />
                                 <span>Open workspace</span>

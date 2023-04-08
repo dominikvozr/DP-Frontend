@@ -36,10 +36,10 @@ export const ExamModal = component$(() => {
                     is Open: {examModalData.exam.isOpen.toString()}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
-                    Start: {examModalData.exam.startDate}
+                    Start: {examModalData.exam.startDate.toString()}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
-                    End: {examModalData.exam.endDate}
+                    End: {examModalData.exam.endDate.toString()}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
                     Total points: {examModalData.exam.points}
