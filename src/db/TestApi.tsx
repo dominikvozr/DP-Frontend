@@ -17,6 +17,22 @@ export class TestApi {
     }
   };
 
+  static updateTestResults = async (testId: string, data: any) => {
+    try {
+      const res = await fetch(`${baseUrl}api/v1/student/test/update/results/${testId}`, {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+      return await res.json();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   static getTests = async (cookies: any) => {
     try {
       const res = await fetch(baseUrl + 'api/v1/student/test/index', {

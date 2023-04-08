@@ -76,9 +76,6 @@ export default component$(() => {
   const pipelinesData = usePipelinesData();
 
   useTask$(async () => {
-    if (!pipelinesData.value.isAuthorized) {
-      nav(`${appUrl}login`);
-    }
     state.pipeline = !_.isEmpty(pipelinesData.value.pipelines)
       ? pipelinesData.value.pipelines[0]._id
       : '';
@@ -438,6 +435,8 @@ export default component$(() => {
                           onClick$={async () => {
                             //const { value } = await handleCreate.run(state);
                             const res = await ExamApi.createExam(state);
+                            console.log(res);
+
                             if (res.message === 'success') nav(`${appUrl}professor`);
                           }}
                           class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
