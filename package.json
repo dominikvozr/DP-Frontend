@@ -16,7 +16,6 @@
         "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
         "fmt": "prettier --write .",
         "fmt.check": "prettier --check .",
-
         "preview": "qwik build preview && vite preview --open",
         "serve": "node server/entry.express",
         "start": "vite --open --mode ssr",
@@ -25,7 +24,7 @@
     "devDependencies": {
         "@builder.io/partytown": "^0.7.0",
         "@builder.io/qwik": "^0.100.0",
-        "@builder.io/qwik-city": "^0.100.0",
+        "@builder.io/qwik-city": "^0.101.0",
         "@builder.io/qwik-react": "0.5.0",
         "@emotion/react": "11.10.6",
         "@emotion/styled": "11.10.6",
@@ -39,7 +38,7 @@
         "@types/node-fetch": "latest",
         "@types/react": "18.0.31",
         "@types/react-dom": "18.0.11",
-        "@typescript-eslint/eslint-plugin": "5.57.0",
+        "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "5.57.0",
         "autoprefixer": "10.4.14",
         "compression": "^1.7.4",
