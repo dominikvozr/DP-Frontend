@@ -6,6 +6,7 @@ import { TestClosed } from '~/components/test/testClosed';
 import { TestInvitation } from '~/components/test/testInvitation';
 import { TestShow } from '~/components/test/testShow';
 import { ExamDataContext, TestDataContext } from '~/contexts/contexts';
+import {CoderApi} from "~/db/CoderApi";
 
 /* interface TestData {
   test: Test;
@@ -19,7 +20,22 @@ export const onGet: RequestHandler<TestData> = async ({ request, params }) => {
 
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-  return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
+
+  let link = ''
+  if(data?.exam){
+    let login = await CoderApi.login(request.headers.get('cookie'))
+    // TODO: change response on backend in coder api workspace
+    if(login.id){
+      // TODO: create post data request
+      link = await CoderApi.createWorkspace(data)
+    }else{
+      login = await CoderApi.createUser(request.headers.get('cookie'))
+      if(login.id)
+        link = await CoderApi.createWorkspace(data)
+    }
+  }
+
+  return { test: data?.test, exam: data?.exam, user: data?.user, examLink:link, isAuthorized: data?.isAuthorized };
 });
 
 export default component$(() => {

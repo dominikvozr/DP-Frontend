@@ -79,11 +79,14 @@ export class CoderApi {
             console.error(e);
         }
     };
-    static createUser = async () => {
+    static createUser = async (cookies: any) => {
         try {
             const res = await fetch(baseUrl + 'api/v1/coder/users', {
                 method: 'POST',
-                credentials: 'include'
+                credentials: 'include',
+                headers: {
+                    Cookie: cookies,
+                },
             });
             return await res.json();
         } catch (e) {
