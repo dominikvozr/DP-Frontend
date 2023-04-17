@@ -44,7 +44,7 @@ export default component$(() => {
     tests: [] as any,
     testsFile: {} as any,
     pipeline: '',
-    templateId: 0,
+    templateId: '',
     points: 0,
   });
 
@@ -414,21 +414,23 @@ export default component$(() => {
                         <div class="mt-1 sm:mt-0">
                           <select
                             onChange$={(evt) => {
-                              console.log(evt);
-                              state.templateId = parseInt(evt.target.value);
+                              state.templateId = evt.target.value;
                             }}
                             id="template"
                             name="template"
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
-                            <option value={1} selected={state.templateId === 1}>
-                              IntelliJ IDEA
+                            <option
+                              value="961bbe6-096a-49a6-bc35-9c5bdce1df79"
+                              selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}
+                            >
+                              main
                             </option>
-                            <option value={2} selected={state.templateId === 2}>
-                              PyCharm
-                            </option>
-                            <option value={3} selected={state.templateId === 3}>
-                              Clion
+                            <option
+                              value="c4496287-7799-4996-a0f0-46003bda3a51"
+                              selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
+                            >
+                              default
                             </option>
                           </select>
                         </div>
