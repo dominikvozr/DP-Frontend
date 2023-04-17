@@ -76,7 +76,7 @@ export default component$(() => {
                       <div class="flex items-center space-x-2">
                         <QRectangleStackIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span class="text-sm font-medium text-gray-500">
-                          Testov: {dataResource.value.tests.length}
+                          Testov: {dataResource.value.tests?.length}
                         </span>
                       </div>
                     </div>
