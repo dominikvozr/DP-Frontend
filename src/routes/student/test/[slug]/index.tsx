@@ -20,22 +20,32 @@ export const onGet: RequestHandler<TestData> = async ({ request, params }) => {
 
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
+  let examData: any;
 
-  let link = ''
-  if(data?.exam){
-    let login = await CoderApi.login(request.headers.get('cookie'))
-    // TODO: change response on backend in coder api workspace
-    if(login.id){
-      // TODO: create post data request
-      link = await CoderApi.createWorkspace(data)
-    }else{
-      login = await CoderApi.createUser(request.headers.get('cookie'))
-      if(login.id)
-        link = await CoderApi.createWorkspace(data)
+  if (data?.exam.isOpen) {
+    // Log in coder instance via API
+    let login = await CoderApi.login(request.headers.get('cookie'));
+
+    if (login.id) { // Check if user exists
+      const workspace = await CoderApi.createWorkspace( request.headers.get('cookie'),data?.exam); // Create workspace
+
+      if (workspace.id) {
+        examData = await CoderApi.getSession( request.headers.get('cookie'));
+      }
+    } else { // User doesn't exist, create a new user
+      login = await CoderApi.createUser(request.headers.get('cookie'));
+
+      if (login.id) {
+        const workspace = await CoderApi.createWorkspace( request.headers.get('cookie'),data?.exam);
+
+        if (workspace.id) {
+          examData = await CoderApi.getSession( request.headers.get('cookie'));
+        }
+      }
     }
   }
 
-  return { test: data?.test, exam: data?.exam, user: data?.user, examLink:link, isAuthorized: data?.isAuthorized };
+  return { test: data?.test, exam: data?.exam, user: data?.user, examLink:examData.workspaceLink, email:examData.email, password: examData.password, isAuthorized: data?.isAuthorized };
 });
 
 export default component$(() => {

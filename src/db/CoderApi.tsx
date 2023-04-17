@@ -45,27 +45,43 @@ export class CoderApi {
         }
     };
 
-    /***
-     * Create Workspace
-     * @param data {
-     *   "autostart_schedule": "string",
-     *   "name": "string",
-     *   "template_id": "c6d67e98-83ea-49f0-8812-e4abae2b68bc",
-     *   "ttl_ms": 0
-     * }
-     */
-    static createWorkspace = async (data: any) => {
+    static createWorkspace = async (cookies: any,data: any, params?: any) => {
         try {
+            const ttl_ms = Math.round(data.startDate.getTime() - data.endDate.getTime());
+            if(params) {
+                // TODO additional parameters for creation
+            }
+            const body = {
+                autostart_schedule: data.startDate.toString(),
+                "name": data.name,
+                "template_id": data.template_id,
+                "ttl_ms": ttl_ms
+            }
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces', {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify(data)
+                headers: {
+                    Cookie: cookies,
+                },
+                body: JSON.stringify(body)
             });
             return await res.json();
         } catch (e) {
             console.error(e);
         }
     };
+
+    static getSession = async (cookies:any) => {
+        const res = await fetch(baseUrl + 'api/v1/coder/workspaces', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                Cookie: cookies,
+            },
+
+        });
+        return await res.json();
+    }
 
     static getOrganization = async (data: any) => {
         try {
