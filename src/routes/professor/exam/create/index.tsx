@@ -46,6 +46,7 @@ export default component$(() => {
     pipeline: '',
     templateId: '',
     points: 0,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
   const loading = useSignal<boolean>(false);
