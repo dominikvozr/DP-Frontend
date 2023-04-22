@@ -45,23 +45,24 @@ export class CoderApi {
         }
     };
 
-    static createWorkspace = async (cookies: any,data: any, params?: any) => {
+    static createWorkspace = async (data: any,cookies: any, params?: any) => {
         try {
-            const ttl_ms = Math.round(data.startDate.getTime() - data.endDate.getTime());
+            const ttl_ms = Math.round(data.endDate.getTime() - data.startDate.getTime());
             if(params) {
                 // TODO additional parameters for creation
             }
             const body = {
-                autostart_schedule: data.startDate.toString(),
-                "name": data.name,
-                "template_id": data.template_id,
-                "ttl_ms": ttl_ms
+                name: data.name.toString(),
+                template_id: data.template_id.toString(),
+                ttl_ms: ttl_ms
             }
-            const res = await fetch(baseUrl + 'api/v1/coder/workspaces', {
+            const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                     Cookie: cookies,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(body)
             });
@@ -71,15 +72,33 @@ export class CoderApi {
         }
     };
 
-    static getSession = async (cookies:any) => {
-        const res = await fetch(baseUrl + 'api/v1/coder/workspaces', {
+    static getSession = async (username: string, workspaceName:string, cookies:any) => {
+        const res = await fetch(baseUrl + `api/v1/coder/workspaces/session/${username}/${workspaceName}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
                 Cookie: cookies,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
 
         });
+
+        return await res.json();
+    }
+
+    static getStatus = async (username: string, workspaceName:string, cookies:any) => {
+        const res = await fetch(baseUrl + `api/v1/coder/workspaces/status/${username}/${workspaceName}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                Cookie: cookies,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+
+        });
+
         return await res.json();
     }
 
@@ -95,6 +114,28 @@ export class CoderApi {
             console.error(e);
         }
     };
+
+    static getStatusInterval = async (workspaceId: string, userKey:string, cookies: any, ) => {
+        try {
+            // const res = await fetch(`http://bawix.xyz:81/api/v2/workspaces/${workspaceId}/watch`, {
+            //     method: 'GET',
+            //     credentials: 'include',
+            //     headers: {
+            //         Cookie: cookies,
+            //         'Content-Type': 'application/json',
+            //         'Accept': 'application/json',
+            //         'Coder-Session-Token': userKey
+            //
+            //     },
+            // });
+            // return res.text();
+
+
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     static createUser = async (cookies: any) => {
         try {
             const res = await fetch(baseUrl + 'api/v1/coder/users', {
@@ -109,4 +150,5 @@ export class CoderApi {
             console.error(e);
         }
     };
+
 }

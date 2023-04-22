@@ -8,12 +8,13 @@ import { qwikReact } from "@builder.io/qwik-react/vite";
 
 export default defineConfig(() => {
   return {
-    basePathname: '/app/',
+    basePathname: "/app/",
     plugins: [
       qwikCity(),
       qwikVite(),
       tsconfigPaths(),
       partytownVite({ dest: join(__dirname, "public", "~partytown") }),
+      qwikReact(),
       qwikReact(),
     ],
     preview: {
