@@ -22,5 +22,6 @@ interface WorkspaceState {
   workspaceLink: any,
   workspaceId: any,
   cookie: string,
-  userKey: any
+  userKey: any,
+  endDate: any
 }

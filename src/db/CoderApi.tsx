@@ -14,7 +14,7 @@ export class CoderApi {
 
             return await res.json();
         } catch (e) {
-            console.error(e);
+            // console.error(e);
         }
     };
 
@@ -47,15 +47,23 @@ export class CoderApi {
 
     static createWorkspace = async (data: any,cookies: any, params?: any) => {
         try {
-            const ttl_ms = Math.round(data.endDate.getTime() - data.startDate.getTime());
+            const endDate = new Date(data.endDate);
+            let startDate = new Date(data.startDate)
+
+            if(startDate.getTime()<= new Date().getTime()){
+                startDate = new Date()
+            }
+
+            const ttl_ms = Math.round(startDate.getTime() - endDate.getTime());
             if(params) {
                 // TODO additional parameters for creation
             }
             const body = {
-                name: data.name.toString(),
-                template_id: data.template_id.toString(),
+                name: data.name,
+                template_id: data.templateId,
                 ttl_ms: ttl_ms
             }
+
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',
@@ -68,7 +76,7 @@ export class CoderApi {
             });
             return await res.json();
         } catch (e) {
-            console.error(e);
+            return e
         }
     };
 
