@@ -66,6 +66,6 @@
     "dayjs": "^1.11.7",
     "lodash": "^4.17.21",
     "react-tailwindcss-datepicker": "^1.5.1",
-    "tw-elements": "^1.0.0-beta1"
+    "tw-elements": "^1.0.0-beta2"
   }
 }

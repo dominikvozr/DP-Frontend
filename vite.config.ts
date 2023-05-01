@@ -15,7 +15,6 @@ export default defineConfig(() => {
       tsconfigPaths(),
       partytownVite({ dest: join(__dirname, "public", "~partytown") }),
       qwikReact(),
-      qwikReact(),
     ],
     preview: {
       headers: {

@@ -12,11 +12,7 @@ import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 import { Pipeline } from '~/models/Pipeline';
-<<<<<<< HEAD
-import {CoderApi} from '~/db/CoderApi';
-=======
 import { Input, Datepicker, Timepicker, initTE } from 'tw-elements';
->>>>>>> dev
 
 export const onGet: RequestHandler = async ({ redirect, request }) => {
   const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
@@ -425,12 +421,6 @@ export default component$(() => {
                             name="template"
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
-<<<<<<< HEAD
-                            <option value={1} selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}>
-                              main
-                            </option>
-                            <option value={2} selected={state.templateId === "c4496287-7799-4996-a0f0-46003bda3a51"}>
-=======
                             <option
                               value="961bbe6-096a-49a6-bc35-9c5bdce1df79"
                               selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}
@@ -441,7 +431,6 @@ export default component$(() => {
                               value="c4496287-7799-4996-a0f0-46003bda3a51"
                               selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
                             >
->>>>>>> dev
                               default
                             </option>
                           </select>
