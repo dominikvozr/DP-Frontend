@@ -7,6 +7,8 @@ import { TestApi } from '~/db/TestApi';
 import { TestItem } from '~/components/student/TestItem';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
+import {CoderApi} from "~/db/CoderApi";
+
 
 export const useTestsData = routeLoader$(async ({ request }) => {
   const data = await TestApi.getTests(request.headers.get('cookie'));
@@ -21,7 +23,7 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
   if (!data || !data.isAuthorized) {
     throw redirect(302, `${appUrl}login`);
   }
-};
+}
 
 export default component$(() => {
   const state = useStore({
