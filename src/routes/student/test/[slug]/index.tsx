@@ -1,23 +1,24 @@
+// Import Qwik libraries and functions
 import {
     component$,
-    useContext,
     useContextProvider,
-    useSignal,
     useStore,
     useTask$,
     useVisibleTask$,
+    useContext,
+    useSignal,
 } from '@builder.io/qwik';
 import {DocumentHead, RequestHandler, routeLoader$} from '@builder.io/qwik-city';
+import {appUrl} from "~/db/url";
 import {TestApi} from '~/db/TestApi';
-import _ from 'lodash';
-import {ExamDataContext, TestDataContext, WorkspaceContext} from '~/contexts/contexts';
 import {CoderApi} from "~/db/CoderApi";
+import {UserApi} from "~/db/UserApi";
+import {ExamDataContext, TestDataContext, WorkspaceContext} from '~/contexts/contexts';
 import {TestInvitation} from "~/components/test/testInvitation";
 import {TestClosed} from "~/components/test/testClosed";
-import {ExamApi} from "~/db/ExamApi";
-import {appUrl} from "~/db/url";
-import {UserApi} from "~/db/UserApi";
+import _ from 'lodash';
 
+//Check authorisation
 export const onGet: RequestHandler = async ({ request, redirect, url }) => {
     const slug = url.searchParams.get('test') ?? '';
     if (slug !== '') throw redirect(302, appUrl + 'student/test/' + slug);
@@ -28,12 +29,13 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
     }
 }
 
+//RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
     const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-    console.log(data)
     const startDate = new Date(data.exam.startDate)
-
-    if(startDate<= new Date()){
+    const endDate = new Date(data.exam.endDate)
+    const currentDate =  new Date()
+    if(startDate <= currentDate && currentDate <= endDate){
         data.exam.isOpen=true
     }
     return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
@@ -69,7 +71,6 @@ export const createWorkspace=routeLoader$(async(requestEvent)=>{
 
                 const workspace = await CoderApi.createWorkspace(data.exam, cookie);
                 const accessData = await CoderApi.getSession(user.userObject.username, data.exam.name, cookie);
-                console.log(user.userObject)
                 return {
                     workspace: workspace,
                     accessData: JSON.parse(accessData),
@@ -90,7 +91,7 @@ export const createWorkspace=routeLoader$(async(requestEvent)=>{
         return {workspace: undefined, accessData: undefined,endDate:undefined, cookie: ''}
 });
 
-
+// Components
 export default component$(() => {
 
     const examState = useStore({
@@ -115,7 +116,7 @@ export default component$(() => {
 
             {/* display test if exist */}
             {!_.isEmpty(testState.test) && <TestInvitation/>}
-            {/*<TestShow />*/}
+
             {/* display test invite if open */}
             {_.isEmpty(testState.test) && examState.exam.isOpen &&  <TestShow />}
 
@@ -192,7 +193,7 @@ const TestShow = component$(()=>{
             <p>Prihlasovacie údaje</p>
             <p>email: {workspaceState.email}</p>
             <p>heslo: {workspaceState.password}</p>
-            <a href={statusSignal.value === "running" ? workspaceState.workspaceLink : ""} target={"_blank"}>{statusSignal.value === "running" ? "zacni pisat test" : statusSignal.value }</a>
+            <a style={statusSignal.value === "running" ? "": "pointer-events:none"} href={statusSignal.value === "running" ? workspaceState.workspaceLink : ""} target={"_blank"}>{statusSignal.value === "running" ? "zacni pisat test" : statusSignal.value }</a>
         </div>
 
     );

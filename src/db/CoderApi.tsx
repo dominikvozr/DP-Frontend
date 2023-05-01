@@ -14,7 +14,7 @@ export class CoderApi {
 
             return await res.json();
         } catch (e) {
-            // console.error(e);
+            console.error(e);
         }
     };
 
@@ -54,7 +54,10 @@ export class CoderApi {
                 startDate = new Date()
             }
 
-            const ttl_ms = Math.round(startDate.getTime() - endDate.getTime());
+            const ttl_ms = Math.round(endDate.getTime() - startDate.getTime());
+            if(ttl_ms<=120_000){
+                return new Error("bad ttl_ms")
+            }
             if(params) {
                 // TODO additional parameters for creation
             }
@@ -125,18 +128,18 @@ export class CoderApi {
 
     static getStatusInterval = async (workspaceId: string, userKey:string, cookies: any, ) => {
         try {
-            // const res = await fetch(`http://bawix.xyz:81/api/v2/workspaces/${workspaceId}/watch`, {
-            //     method: 'GET',
-            //     credentials: 'include',
-            //     headers: {
-            //         Cookie: cookies,
-            //         'Content-Type': 'application/json',
-            //         'Accept': 'application/json',
-            //         'Coder-Session-Token': userKey
-            //
-            //     },
-            // });
-            // return res.text();
+            const res = await fetch(`http://bawix.xyz:81/api/v2/workspaces/${workspaceId}/watch`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    Cookie: cookies,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Coder-Session-Token': userKey
+
+                },
+            });
+            return res.text();
 
 
         } catch (e) {
