@@ -16,8 +16,20 @@ interface TestState {
   test: any;
 }
 
+export const WorkspaceContext = createContextId<WorkspaceState>('workspace-data');
+interface WorkspaceState {
+  email: any,
+  password: any,
+  workspaceLink: any,
+  workspaceId: any,
+  cookie: string,
+  userKey: any,
+  endDate: any
+}
+
 export const ExamModalDataContext = createContextId<ExamModalState>('exam-modal-data');
 interface ExamModalState {
   open: boolean;
   exam: Exam;
 }
+

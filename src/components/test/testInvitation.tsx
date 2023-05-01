@@ -59,9 +59,15 @@ export const TestInvitation = component$(() => {
                 {state.endDate.toLocaleTimeString('sk-SK')}
               </div>
             </div>
+            <div class="text-lg text-center font-semibold leading-7 text-indigo-300 ">
+              Prihlasovacie údaje
+              email: {examData.exam.email}
+              heslo: {examData.exam.password}
+            </div>
             <div class="mt-8 flex justify-end">
               <a
-                href="#"
+                href={examData.exam.examLink}
+                target="_blank"
                 class="inline-flex rounded-md bg-white/10 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Začať písať test
