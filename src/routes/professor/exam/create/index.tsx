@@ -1,4 +1,4 @@
-import { component$, useStore, $, useSignal, useTask$ } from '@builder.io/qwik';
+import { component$, useStore, $, useSignal, useTask$, useVisibleTask$ } from '@builder.io/qwik';
 import {
   DocumentHead,
   RequestHandler,
@@ -12,7 +12,11 @@ import { PipelineApi } from '~/db/PipelineApi';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 import { Pipeline } from '~/models/Pipeline';
+<<<<<<< HEAD
 import {CoderApi} from '~/db/CoderApi';
+=======
+import { Input, Datepicker, Timepicker, initTE } from 'tw-elements';
+>>>>>>> dev
 
 export const onGet: RequestHandler = async ({ redirect, request }) => {
   const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
@@ -28,10 +32,6 @@ export const usePipelinesData = routeLoader$(async ({ request }) => {
   return { pipelines, isAuthorized };
 });
 
-/* export const useHandleUpload = routeAction$(
-  async (destination: string, file: any) => await ExamApi.uploadExamProject(destination, file),
-);*/
-
 export const useHandleCreate = routeAction$(async (state: any) => await ExamApi.createExam(state));
 
 export default component$(() => {
@@ -42,34 +42,18 @@ export default component$(() => {
     subject: '',
     startDate: '',
     endDate: '',
+    startTime: '',
+    endTime: '',
     project: {} as any,
     tests: [] as any,
     testsFile: {} as any,
     pipeline: '',
     templateId: '',
     points: 0,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
   const loading = useSignal<boolean>(false);
-
-  // const handleUpload = useHandleUpload();
-  /* $(async (destination: string, file: File) => {
-    const data = await ExamApi.uploadExamProject(destination, file);
-    if (destination === 'project') {
-      state.project = data;
-    } else {
-      state.exams = data.matches;
-      state.examsFile = data.file;
-    }
-  }); */
-
-  // const handleCreate = useHandleCreate();
-  /* $(async () => {
-    await ExamApi.createExam(state);
-    if(response.message === "success")
-        nav.path = `${appUrl}professor`
-  }); */
-
   const recalculatePoints = $(() => {
     state.points = state.tests.reduce((acc: any, obj: any) => acc + obj.points, 0) || 0;
   });
@@ -77,12 +61,17 @@ export default component$(() => {
   const pipelinesData = usePipelinesData();
 
   useTask$(async () => {
-    if (!pipelinesData.value.isAuthorized) {
-      nav(`${appUrl}login`);
-    }
     state.pipeline = !_.isEmpty(pipelinesData.value.pipelines)
       ? pipelinesData.value.pipelines[0]._id
       : '';
+  });
+
+  useVisibleTask$(async () => {
+    initTE({ Input, Timepicker, Datepicker });
+    const startPicker = document.querySelector('#start-timepicker-format');
+    const endPicker = document.querySelector('#end-timepicker-format');
+    new Timepicker(startPicker, { format24: true });
+    new Timepicker(endPicker, { format24: true });
   });
 
   return (
@@ -161,16 +150,50 @@ export default component$(() => {
                             Začiatok
                           </label>
                           <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
-                            <input
-                              type="text"
-                              name="start-date"
-                              placeholder="YYYY-MM-DD HH:MM"
-                              onInput$={(ev: any) => {
-                                state.startDate = ev.target.value;
-                              }}
-                              id="start-date"
-                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            />
+                            <div
+                              class="relative mb-3"
+                              data-te-datepicker-init
+                              data-te-input-wrapper-init
+                            >
+                              <input
+                                type="text"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                placeholder="Select a date"
+                                onInput$={(ev: any) => {
+                                  console.log(ev.target.value);
+                                  state.startDate = ev.target.value;
+                                }}
+                              />
+                              <label
+                                for="floatingInput"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                              >
+                                Select a date
+                              </label>
+                            </div>
+                            <div
+                              class="relative"
+                              data-te-format24="true"
+                              id="start-timepicker-format"
+                              data-te-input-wrapper-init
+                            >
+                              <input
+                                type="text"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                data-te-toggle="timepicker"
+                                id="form14"
+                                onInput$={(ev: any) => {
+                                  console.log(ev.target.value);
+                                  state.startTime = ev.target.value;
+                                }}
+                              />
+                              <label
+                                for="form14"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                              >
+                                Select a time
+                              </label>
+                            </div>
                           </div>
                         </div>
                         <div class="flex space-x-3 sm:pt-5">
@@ -181,16 +204,50 @@ export default component$(() => {
                             Koniec
                           </label>
                           <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
-                            <input
-                              type="text"
-                              name="end-date"
-                              placeholder="YYYY-MM-DD HH:MM"
-                              onInput$={(ev: any) => {
-                                state.endDate = ev.target.value;
-                              }}
-                              id="end-date"
-                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            />
+                            <div
+                              class="relative mb-3"
+                              data-te-datepicker-init
+                              data-te-input-wrapper-init
+                            >
+                              <input
+                                type="text"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                placeholder="Select a date"
+                                onInput$={(ev: any) => {
+                                  console.log(ev.target.value);
+                                  state.endDate = ev.target.value;
+                                }}
+                              />
+                              <label
+                                for="floatingInput"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                              >
+                                Select a date
+                              </label>
+                            </div>
+                            <div
+                              class="relative"
+                              data-te-format24="true"
+                              id="end-timepicker-format"
+                              data-te-input-wrapper-init
+                            >
+                              <input
+                                type="text"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                data-te-toggle="timepicker"
+                                onInput$={(ev: any) => {
+                                  console.log(ev.target.value);
+                                  state.endTime = ev.target.value;
+                                }}
+                                id="form14"
+                              />
+                              <label
+                                for="form14"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                              >
+                                Select a time
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -368,10 +425,23 @@ export default component$(() => {
                             name="template"
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
+<<<<<<< HEAD
                             <option value={1} selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}>
                               main
                             </option>
                             <option value={2} selected={state.templateId === "c4496287-7799-4996-a0f0-46003bda3a51"}>
+=======
+                            <option
+                              value="961bbe6-096a-49a6-bc35-9c5bdce1df79"
+                              selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}
+                            >
+                              main
+                            </option>
+                            <option
+                              value="c4496287-7799-4996-a0f0-46003bda3a51"
+                              selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
+                            >
+>>>>>>> dev
                               default
                             </option>
                           </select>
@@ -436,6 +506,8 @@ export default component$(() => {
                           onClick$={async () => {
                             //const { value } = await handleCreate.run(state);
                             const res = await ExamApi.createExam(state);
+                            console.log(res);
+
                             if (res.message === 'success') nav(`${appUrl}professor`);
                           }}
                           class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
