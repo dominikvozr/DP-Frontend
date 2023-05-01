@@ -1,5 +1,5 @@
 import { qwikify$ } from '@builder.io/qwik-react';
-import { component$ } from '@builder.io/qwik';
+import { component$, useStore } from '@builder.io/qwik';
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon';
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon';
 import { DocumentHead, RequestHandler, routeLoader$ } from '@builder.io/qwik-city';
@@ -24,6 +24,9 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 };
 
 export default component$(() => {
+  const state = useStore({
+    examCode: '',
+  });
   const dataResource = useTestsData();
   const QCheckBadgeIcon = qwikify$(CheckBadgeIcon);
   const QRectangleStackIcon = qwikify$(RectangleStackIcon);
@@ -70,13 +73,41 @@ export default component$(() => {
                           </a>
                         </div>
                       </div>
+                      <div class="flex flex-col">
+                        <label
+                          for="exam_code"
+                          class="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                          Exam code
+                        </label>
+                        <div class="mt-2">
+                          <input
+                            type="text"
+                            name="exam_code"
+                            id="exam_code"
+                            onInput$={(evt: any) => {
+                              if (evt.target) {
+                                state.examCode = evt.target.value;
+                              }
+                            }}
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            placeholder="exam-123"
+                          />
+                        </div>
+                        <a
+                          href={`${appUrl}student/test/${state.examCode}`}
+                          class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 mt-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 xl:w-full"
+                        >
+                          Join Exam
+                        </a>
+                      </div>
                     </div>
                     {/* Meta info */}
                     <div class="flex flex-col space-y-6 sm:flex-row sm:space-y-0 sm:space-x-8 xl:flex-col xl:space-x-0 xl:space-y-6">
                       <div class="flex items-center space-x-2">
                         <QRectangleStackIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span class="text-sm font-medium text-gray-500">
-                          Testov: {dataResource.value.tests?.length}
+                          Tests: {dataResource.value.tests?.length}
                         </span>
                       </div>
                     </div>
@@ -89,12 +120,17 @@ export default component$(() => {
             <div class="bg-white lg:min-w-0 lg:flex-1">
               <div class="border-b border-t border-gray-200 pl-4 pr-6 pt-4 pb-4 sm:pl-6 lg:pl-8 xl:border-t-0 xl:pl-6 xl:pt-6">
                 <div class="flex items-center">
-                  <h1 class="flex-1 text-lg font-medium">Testy</h1>
+                  <h1 class="flex-1 text-lg font-medium">Tests</h1>
                 </div>
               </div>
               <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
                 {dataResource.value.tests?.map((test: any) => (
-                  <TestItem test={test} />
+                  <li
+                    key={test._id}
+                    class="relative py-5 pl-4 pr-6 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6"
+                  >
+                    <TestItem test={test} />
+                  </li>
                 ))}
               </ul>
             </div>
@@ -129,7 +165,7 @@ export default component$(() => {
                   ))}
                 </ul>
                 <div class="border-t border-gray-200 py-4 text-sm">
-                  <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-900">
+                  <a href="#" class="font-semibold text-blue-600 hover:text-blue-900">
                     View all activity
                     <span aria-hidden="true"> &rarr;</span>
                   </a>
