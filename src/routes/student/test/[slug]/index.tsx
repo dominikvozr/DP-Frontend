@@ -35,7 +35,7 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
   const startDate = new Date(data.exam.startDate);
   const endDate = new Date(data.exam.endDate);
   const currentDate = new Date();
-  if (startDate <= currentDate && currentDate <= endDate) {
+  if (startDate <= currentDate && currentDate < endDate) {
     data.exam.isOpen = true;
   }
   return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
