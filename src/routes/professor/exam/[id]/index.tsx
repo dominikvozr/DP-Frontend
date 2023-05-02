@@ -284,7 +284,7 @@ export default component$(() => {
                 )}
                 <div class="p-2 text-gray-600">
                   <div class={profileTabs.active !== 'profile' ? 'hidden' : ''}>
-                    <div>email: {state.test.user.email}</div>
+                    <div>email: {state.test.user && state.test.user.email}</div>
                   </div>
                   <div class={profileTabs.active !== 'test-results' ? 'hidden' : ''}>
                     {state.test.score?.tests.map((result: any, index: number) => {
