@@ -28,7 +28,7 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
 
 export default component$(() => {
 	const state = useStore({
-		examTests: [],
+		examTests: [] as any,
 		message: '',
 		loading: false,
 		alert: false,
@@ -70,7 +70,7 @@ export default component$(() => {
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
 							<p class="text-sm font-medium leading-6 text-blue-400">Total available points</p>
 							<p class="mt-2 flex items-baseline gap-x-2 justify-center">
-								<span class="text-4xl font-semibold tracking-tight text-white">{state.examTests.reduce((acc, curr) => acc + curr.points, 0)}</span>
+								<span class="text-4xl font-semibold tracking-tight text-white">{state.examTests.reduce((acc: number, curr:any) => acc + curr.points, 0)}</span>
 							</p>
 						</div>
 					</div>
@@ -164,7 +164,7 @@ export default component$(() => {
 					class={`${!state.loading ? 'block' : 'hidden'} inline-flex items-center justify-center rounded-md border border-transparent bg-orange-600 px-4 py-2 mt-2 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 w-36`}
 					onClick$={async() => {
 						state.loading = true
-						const result = await ReportApi.createReport({ testId: dataResource.value.test._id, message: state.message })
+						const result: any = await ReportApi.createReport({ testId: dataResource.value.test._id, message: state.message })
 						state.loading = false
 						if (result.status === 200) {
 							state.alert = true
