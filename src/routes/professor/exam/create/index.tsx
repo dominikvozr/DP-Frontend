@@ -190,7 +190,7 @@ export default component$(() => {
                                 id="form14"
                                 onInput$={(ev: any) => {
                                   console.log(convertToGMT(ev.target.value));
-                                  state.startTime = convertToGMT(ev.target.value);
+                                  state.startTime = ev.target.value;
                                 }}
                               />
                               <label
@@ -243,7 +243,7 @@ export default component$(() => {
                                 data-te-toggle="timepicker"
                                 onInput$={(ev: any) => {
                                   console.log(convertToGMT(ev.target.value));
-                                  state.endTime = convertToGMT(ev.target.value);
+                                  state.endTime = ev.target.value;
                                 }}
                                 id="form14"
                               />
