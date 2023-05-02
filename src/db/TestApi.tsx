@@ -17,17 +17,17 @@ export class TestApi {
     }
   };
 
-  static updateTestResults = async (testId: string, data: any) => {
+  static updateTestResults = async (test: any) => {
     try {
-      const res = await fetch(`${baseUrl}api/v1/student/test/update/results/${testId}`, {
-        method: 'POST',
+      const res = await fetch(`${baseUrl}api/v1/student/test/update/score/${test._id}`, {
+        method: 'PUT',
         credentials: 'include',
-        body: JSON.stringify(data),
+        body: JSON.stringify(test),
         headers: {
           'content-type': 'application/json',
         },
       });
-      return await res.json();
+      return res;
     } catch (e) {
       console.error(e);
     }

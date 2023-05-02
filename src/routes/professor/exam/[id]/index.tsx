@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { component$, useStore, useTask$, $, useContextProvider } from '@builder.io/qwik';
+import { component$, useStore, useTask$, useContextProvider } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, routeLoader$, useNavigate } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
 import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
@@ -9,18 +9,9 @@ import { ExamApi } from '~/db/ExamApi';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 import _ from 'lodash';
-import { TestApi } from '~/db/TestApi';
 import { ExamModal } from '~/components/exam/modal';
 import { ExamModalDataContext } from '~/contexts/contexts';
-
-interface Score {
-    tests: any
-    points: number,
-    message: string,
-    percentage: number,
-    mark: string,
-    time: Date,
-}
+import { ReportApi } from '~/db/ReportApi';
 
 export const onGet: RequestHandler = async ({ redirect, request }) => {
   const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
@@ -43,7 +34,7 @@ export default component$(() => {
     active: 'profile',
     tabs: [
       { name: 'Profile', slug: 'profile', current: true },
-      { name: 'Test results', slug: 'test-results', current: false },
+      { name: 'Reports', slug: 'reports', current: false },
     ],
   });
   const state = useStore({
@@ -52,11 +43,13 @@ export default component$(() => {
     endDate: new Date(),
     testOrder: -1,
     test: {} as any,
+    replies: {} as any,
+    savedHide: [] as any,
   });
   const dataResource = useExamData();
   const examModalData = useStore({
     open: false,
-    exam: dataResource.value.exam
+    exam: dataResource.value.exam,
   });
 
   useTask$(async () => {
@@ -71,24 +64,13 @@ export default component$(() => {
   const QCommandLineIcon = qwikify$(CommandLineIcon);
   useContextProvider(ExamModalDataContext, examModalData);
 
-  const recalculateScore = $((score: Score) => {
-    let sum = 0
-    score.tests.map((test: any, index: number) => {
-      sum += test.value
-      score.tests[index].result = test.value > 0
-    })
-    score.points = sum
-    score.percentage = sum / state.test.exam.points * 100
-    score.time = new Date()
-    return score
-  })
   const profile = {
     coverImageUrl:
       'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
   };
   return (
     <>
-      <ExamModal/>
+      <ExamModal />
       <div class="flex h-full">
         <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div class="py-2 min-w-0 border-b border-indigo-800 bg-indigo-600">
@@ -98,7 +80,7 @@ export default component$(() => {
                   href={`${appUrl}professor`}
                   class="inline-flex items-center space-x-3 text-sm font-medium text-gray-900"
                 >
-                  <QChevronLeftIcon className="-ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <QChevronLeftIcon class="-ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 </a>
                 <h1 class="truncate self-center ml-5 text-2xl text-center font-bold text-indigo-200">
                   {dataResource.value.exam.name} - {dataResource.value.exam.subject}
@@ -107,14 +89,24 @@ export default component$(() => {
                   class="inline-flex items-center space-x-3 text-sm font-medium text-gray-900 ml-3"
                   preventdefault:click
                   onClick$={() => {
-                    examModalData.open = true
+                    examModalData.open = true;
                   }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="rgb(236 72 153)" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="rgb(236 72 153)"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                    />
                   </svg>
                 </button>
-
               </div>
               <div class="flex">
                 <a
@@ -214,7 +206,8 @@ export default component$(() => {
                             <img
                               class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                               src={state.test.user.avatarUrl}
-                              alt=""/>
+                              alt=""
+                            />
                           </div>
                           <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                             <div class="mt-6 min-w-0 flex-1 sm:hidden 2xl:block">
@@ -223,22 +216,23 @@ export default component$(() => {
                               </h1>
                             </div>
                             <div class="justify-stretch mt-6 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-                              <button
+                              <a
+                                href={`${appUrl}professor/test/${state.test.slug}/evaluation`}
                                 type="button"
                                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                               >
                                 <QEnvelopeIcon
-                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                                  class="-ml-1 mr-2 h-5 w-5 text-gray-400"
                                   aria-hidden="true"
                                 />
-                                <span>Message</span>
-                              </button>
+                                <span>Evaluation</span>
+                              </a>
                               <button
                                 type="button"
                                 class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                               >
                                 <QCommandLineIcon
-                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                                  class="-ml-1 mr-2 h-5 w-5 text-gray-400"
                                   aria-hidden="true"
                                 />
                                 <span>Open workspace</span>
@@ -286,27 +280,36 @@ export default component$(() => {
                   <div class={profileTabs.active !== 'profile' ? 'hidden' : ''}>
                     <div>email: {state.test.user && state.test.user.email}</div>
                   </div>
-                  <div class={profileTabs.active !== 'test-results' ? 'hidden' : ''}>
-                    {state.test.score?.tests.map((result: any, index: number) => {
-                      <>
-                        <div class="flex">
-                          <div>{result.name}:</div>
-                          <input
-                            type="number"
-                            value={result.value}
-                            onChange$={(ev) => {
-                              dataResource.value.tests[state.testOrder].score.tests[index].value = ev.target.value
-                              dataResource.value.tests[state.testOrder].score = recalculateScore(dataResource.value.tests[state.testOrder].score)
-                            }}
-                          />
-                        </div>
-                      </>;
+                  <div class={`${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
+                    {/* {JSON.stringify(state.test.reports)} */}
+                    {state.test.reports.map((report: any, index: number) => {
+                      if (report.isOpen)
+                        return (
+                          <>
+                            <div key={index} class={`grid grid-cols-12 ${state.savedHide.includes(report._id) ? 'hidden': ''}`}>
+                              <div class="col-span-2">{report.message}:</div>
+                              <input
+                                class="col-span-4"
+                                type="text"
+                                value={report.value}
+                                onInput$={(evt: any) => {
+                                  if (!evt.target.value) {
+                                    delete state.replies[report._id]
+                                    return
+                                  }
+                                  state.replies[report._id] = evt.target.value;
+                                }}
+                              />
+                            </div>
+                          </>
+                        );
                     })}
                     <button
                       type="submit"
                       class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      onClick$={() => {
-                        TestApi.updateTestResults(state.test._id, state.test.score);
+                      onClick$={async () => {
+                        await ReportApi.reply(state.replies, state.test._id);
+                        state.savedHide += Object.keys(state.replies)
                       }}
                     >
                       save

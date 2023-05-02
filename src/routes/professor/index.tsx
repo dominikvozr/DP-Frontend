@@ -17,14 +17,15 @@ export const onGet: RequestHandler = async ({ request, redirect }) => {
   }
 };
 
-export const useTestData = routeLoader$(async ({ request, params }) => {
-  const data = await ExamApi.getExams(request.headers.get('cookie'), params.page);
+export const useTestData = routeLoader$(async ({ request, query }) => {
+  const page = query.get('page') ?? '0';
+  const data = await ExamApi.getExams(request.headers.get('cookie'), page);
   return {
     user: data.user,
     exams: data.data.exams,
     isAuthorized: data.isAuthorized,
     examsCount: data.data.examsCount,
-    page: parseInt(params.page),
+    page: parseInt(page),
   };
 });
 

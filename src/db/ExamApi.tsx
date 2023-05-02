@@ -18,6 +18,8 @@ export class ExamApi {
   };
 
   static getExams = async (cookies: any, page: string) => {
+    console.log(page);
+
     try {
       const res = await fetch(baseUrl + 'api/v1/professor/exam/index?page=' + page, {
         method: 'GET',

@@ -23,7 +23,7 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
   if (!data || !data.isAuthorized) {
     throw redirect(302, `${appUrl}login`);
   }
-}
+};
 
 export default component$(() => {
   const state = useStore({
