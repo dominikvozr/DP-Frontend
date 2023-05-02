@@ -36,7 +36,7 @@ export function convertToGMT(inputTime: string): string {
   const now = new Date();
 
   const timezoneOffset = now.getTimezoneOffset();
-  const gmtTime = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes) - (timezoneOffset * 60 * 1000);
+  const gmtTime = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes) + (timezoneOffset * 60 * 1000);
   const gmtDate = new Date(gmtTime);
 
   // Format the GMT time as a string in the input format and return it

@@ -32,23 +32,22 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 //RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-  const startDate = new Date(data.exam.startDate);
-  const endDate = new Date(data.exam.endDate);
-  const currentDate = new Date();
-  if (startDate <= currentDate && currentDate < endDate) {
-    data.exam.isOpen = true;
-  }
+
   return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
 });
 
-export const createAndOrLogin = routeLoader$(async ({ request }) => {
-  const loginUser = await CoderApi.login(request.headers.get('cookie'));
-  if (loginUser?.id) {
-    return { userObject: loginUser, isLogged: true };
-  } else {
-    const newUserLogin = await CoderApi.createUser(request.headers.get('cookie'));
-    if (newUserLogin) {
-      return { userObject: newUserLogin, isLogged: true };
+export const createAndOrLogin = routeLoader$(async ( requestEvent ) => {
+  const data = await requestEvent.resolveValue(useTestData);
+  if(data.exam?.isOpen){
+    const loginUser = await CoderApi.login(requestEvent.request.headers.get('cookie'));
+
+    if (loginUser?.id) {
+      return { userObject: loginUser, isLogged: true };
+    } else {
+      const newUserLogin = await CoderApi.createUser(requestEvent.request.headers.get('cookie'));
+      if (newUserLogin) {
+        return { userObject: newUserLogin, isLogged: true };
+      }
     }
   }
 });
