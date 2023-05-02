@@ -72,8 +72,9 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
       );
 
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        const repo = `${data.test.user.gitea.username}/${data.test.slug}`;
-        const workspace = await CoderApi.createWorkspace(data.exam, cookie);
+        const repo = `${data.user.gitea.username}/${data.exam.slug}`;
+        console.log(repo)
+        const workspace = await CoderApi.createWorkspace(data.exam, cookie, repo);
         const accessData = await CoderApi.getSession(
           user.userObject.username,
           data.exam.name,
