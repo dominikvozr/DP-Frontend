@@ -29,7 +29,20 @@ export const usePipelinesData = routeLoader$(async ({ request }) => {
 });
 
 export const useHandleCreate = routeAction$(async (state: any) => await ExamApi.createExam(state));
+function convertToGMT(inputTime: string): string {
+  const [hours, minutes] = inputTime.split(':').map(Number);
 
+  const now = new Date();
+
+  const timezoneOffset = now.getTimezoneOffset();
+  const gmtTime = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes) - (timezoneOffset * 60 * 1000);
+  const gmtDate = new Date(gmtTime);
+
+  // Format the GMT time as a string in the input format and return it
+  const gmtHours = gmtDate.getUTCHours().toString().padStart(2, '0');
+  const gmtMinutes = gmtDate.getUTCMinutes().toString().padStart(2, '0');
+  return `${gmtHours}:${gmtMinutes}`;
+}
 export default component$(() => {
   const nav = useNavigate();
   const state = useStore({
@@ -180,7 +193,8 @@ export default component$(() => {
                                 id="form14"
                                 onInput$={(ev: any) => {
                                   console.log(ev.target.value);
-                                  state.startTime = ev.target.value;
+                                  console.log(convertToGMT(ev.target.value));
+                                  state.startTime = convertToGMT(ev.target.value);
                                 }}
                               />
                               <label
@@ -233,7 +247,9 @@ export default component$(() => {
                                 data-te-toggle="timepicker"
                                 onInput$={(ev: any) => {
                                   console.log(ev.target.value);
-                                  state.endTime = ev.target.value;
+                                  console.log(convertToGMT(ev.target.value))
+                                  state.endTime = convertToGMT((ev.target.value));
+
                                 }}
                                 id="form14"
                               />

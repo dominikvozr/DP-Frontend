@@ -35,7 +35,7 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
     const startDate = new Date(data.exam.startDate)
     const endDate = new Date(data.exam.endDate)
     const currentDate =  new Date()
-    if(startDate <= currentDate && currentDate <= endDate){
+    if((startDate <= currentDate )&& (currentDate < endDate)){
         data.exam.isOpen=true
     }
     return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
@@ -63,14 +63,14 @@ export const createWorkspace=routeLoader$(async(requestEvent)=>{
     if(user && cookie && data ) {
 
         if (user.isLogged) {
-            const workspaceStatus = await CoderApi.getStatus(user.userObject.username, data.exam.name, cookie);
-
-            const accessData = await CoderApi.getSession(user.userObject.username, data.exam.name, cookie);
+            const workspaceStatus = await CoderApi.getStatus(user.userObject.username, data.exam.slug, cookie);
+            const accessData = await CoderApi.getSession(user.userObject.username, data.exam.slug, cookie);
 
             if (workspaceStatus.latest_build?.status === "unfound" && data?.exam.isOpen) {
-                const repo = `${data.test.user.gitea.username}/${data.test.slug}`
+                // const repo = `${data.test.user.gitea.username}/${data.test.slug}`
                 const workspace = await CoderApi.createWorkspace(data.exam, cookie);
-                const accessData = await CoderApi.getSession(user.userObject.username, data.exam.name, cookie);
+                const accessData = await CoderApi.getSession(user.userObject.username, data.exam.slug, cookie);
+
                 return {
                     workspace: workspace,
                     accessData: JSON.parse(accessData),
