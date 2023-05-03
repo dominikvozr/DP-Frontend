@@ -282,7 +282,7 @@ export default component$(() => {
                   </div>
                   <div class={`${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
                     {/* {JSON.stringify(state.test.reports)} */}
-                    {state.test.reports.map((report: any, index: number) => {
+                    {state.test.reports && state.test.reports.map((report: any, index: number) => {
                       if (report.isOpen)
                         return (
                           <>
