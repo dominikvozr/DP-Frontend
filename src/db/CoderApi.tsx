@@ -54,15 +54,15 @@ export class CoderApi {
                 startDate = new Date()
             }
 
-            const ttl_ms = Math.round(endDate.getTime() - startDate.getTime());
+            let ttl_ms = Math.round(endDate.getTime() - startDate.getTime());
             if(ttl_ms<=120_000){
-                return new Error("bad ttl_ms")
+                ttl_ms = 120_000
             }
             if(params) {
                 // TODO additional parameters for creation
             }
             const body = {
-                name: data.name,
+                name: data.slug,
                 template_id: data.templateId,
                 ttl_ms: ttl_ms
             }
@@ -94,7 +94,6 @@ export class CoderApi {
             },
 
         });
-
         return await res.json();
     }
 

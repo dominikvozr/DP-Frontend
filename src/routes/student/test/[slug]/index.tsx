@@ -32,23 +32,22 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 //RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-  const startDate = new Date(data.exam.startDate);
-  const endDate = new Date(data.exam.endDate);
-  const currentDate = new Date();
-  if (startDate <= currentDate && currentDate < endDate) {
-    data.exam.isOpen = true;
-  }
+
   return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
 });
 
-export const createAndOrLogin = routeLoader$(async ({ request }) => {
-  const loginUser = await CoderApi.login(request.headers.get('cookie'));
-  if (loginUser?.id) {
-    return { userObject: loginUser, isLogged: true };
-  } else {
-    const newUserLogin = await CoderApi.createUser(request.headers.get('cookie'));
-    if (newUserLogin) {
-      return { userObject: newUserLogin, isLogged: true };
+export const createAndOrLogin = routeLoader$(async ( requestEvent ) => {
+  const data = await requestEvent.resolveValue(useTestData);
+  if(data.exam?.isOpen){
+    const loginUser = await CoderApi.login(requestEvent.request.headers.get('cookie'));
+
+    if (loginUser?.id) {
+      return { userObject: loginUser, isLogged: true };
+    } else {
+      const newUserLogin = await CoderApi.createUser(requestEvent.request.headers.get('cookie'));
+      if (newUserLogin) {
+        return { userObject: newUserLogin, isLogged: true };
+      }
     }
   }
 });
@@ -61,22 +60,24 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
     if (user.isLogged) {
       const workspaceStatus = await CoderApi.getStatus(
         user.userObject.username,
-        data.exam.name,
+          data.exam.slug,
         cookie,
       );
-
+      const hours = Math.floor(workspaceStatus.ttl_ms / (1000 * 60 * 60));
+      const minutes = Math.floor((workspaceStatus.ttl_ms / (1000 * 60)) % 60);
+      console.log(hours, minutes)
       const accessData = await CoderApi.getSession(
         user.userObject.username,
-        data.exam.name,
+          data.exam.slug,
         cookie,
       );
 
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        const repo = `${data.test.user.gitea.username}/${data.test.slug}`;
-        const workspace = await CoderApi.createWorkspace(data.exam, cookie);
+        const repo = `${data.user.gitea.username}/${data.exam.slug}`;
+        const workspace = await CoderApi.createWorkspace(data.exam, cookie, repo);
         const accessData = await CoderApi.getSession(
           user.userObject.username,
-          data.exam.name,
+            data.exam.slug,
           cookie,
         );
         return {
@@ -157,7 +158,7 @@ const TestShow = component$(() => {
 
   const statusSignal = useSignal('');
 
-  useVisibleTask$(() => {
+  useVisibleTask$(({cleanup}) => {
     const update = () => {
       let appsReady = true;
       CoderApi.getStatus(
@@ -171,38 +172,122 @@ const TestShow = component$(() => {
               resource.agents.forEach((agent: any) => {
                 for (let j = 0; j < agent.apps.length; j++) {
                   if (agent.apps[j].health !== 'healthy') {
-                    statusSignal.value = 'getting ready!';
+                    statusSignal.value = 'Posledné prípravy!';
                     appsReady = false;
                   }
                 }
               });
             }
           });
-          if (appsReady) statusSignal.value = r.latest_build.status;
+          if (appsReady){
+            statusSignal.value = r.latest_build.status;
+            window.open(workspaceState.workspaceLink)
+            clearInterval(tmrId)
+          }
+
         } else {
-          statusSignal.value = r.latest_build.status;
+          statusSignal.value = `Status: ${r.latest_build.status}`;
         }
       });
     };
     update();
     const tmrId = setInterval(update, 1000);
-    return () => clearInterval(tmrId);
+    cleanup(() => clearInterval(tmrId));
   });
 
+  const examData = useContext(ExamDataContext);
   return (
-    <div class="relative flex min-h-full flex-col bg-indigo-400">
-      <Clock></Clock>
-      <p>Prihlasovacie údaje</p>
-      <p>email: {workspaceState.email}</p>
-      <p>heslo: {workspaceState.password}</p>
-      <a
-        style={statusSignal.value === 'running' ? '' : 'pointer-events:none'}
-        href={statusSignal.value === 'running' ? workspaceState.workspaceLink : ''}
-        target={'_blank'}
-      >
-        {statusSignal.value === 'running' ? 'zacni pisat test' : statusSignal.value}
-      </a>
-    </div>
+
+      <>
+
+        <div class="relative bg-gray-900">
+          <div class="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
+            <img class="h-full w-full object-cover" src="/image/thinkin-monke.jpg" alt="sad-face" />
+            <svg
+                viewBox="0 0 926 676"
+                aria-hidden="true"
+                class="absolute left-24 -bottom-24 w-[57.875rem] transform-gpu blur-[118px]"
+            >
+              <path
+                  fill="url(#60c3c621-93e0-4a09-a0e6-4c228a0116d8)"
+                  fill-opacity=".4"
+                  d="m254.325 516.708-90.89 158.331L0 436.427l254.325 80.281 163.691-285.15c1.048 131.759 36.144 345.144 168.149 144.613C751.171 125.508 707.17-93.823 826.603 41.15c95.546 107.978 104.766 294.048 97.432 373.585L685.481 297.694l16.974 360.474-448.13-141.46Z"
+              />
+              <defs>
+                <linearGradient
+                    id="60c3c621-93e0-4a09-a0e6-4c228a0116d8"
+                    x1="926.392"
+                    x2="-109.635"
+                    y1=".176"
+                    y2="321.024"
+                    gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-color="#776FFF" />
+                  <stop offset="1" stop-color="#FF4694" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="relative mx-auto max-w-7xl py-24 sm:py-32 lg:py-40 lg:px-8">
+            <div class="pr-6 pl-6 md:ml-auto md:w-2/3 md:pl-16 lg:w-1/2 lg:pl-24 lg:pr-0 xl:pl-32">
+              <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-3xl">
+                {examData.exam.name} - {examData.exam.subject}
+              </p>
+              <h1 class="text-base font-semibold leading-7 text-indigo-400"><Clock></Clock></h1>
+              <div>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl"><span
+                    class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-1xl">email:</span> {workspaceState.email}</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl"><span
+                    class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-1xl">heslo:</span> {workspaceState.password}</p>
+              </div>
+              <p class="relative mt-6 text-base leading-7 text-gray-300 pb-5">
+                {examData.exam.description}
+                <span class="absolute bottom-0 right-0 text-sm italic">
+                {' '}
+                  autor: {examData.exam.user.displayName}
+              </span>
+              </p>
+              <div class="pr-6 pl-6 md:ml-auto md:w-2/3 md:pl-16 lg:w-1/2 lg:pl-24 lg:pr-0 xl:pl-32">
+
+              </div>
+              <div class="mt-8">
+                <div class={statusSignal.value === 'running' ? "text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-green-400" : "text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-red-400"}>
+                  <a
+                      style={statusSignal.value === 'running' ? '' : 'pointer-events:none'}
+                      href={statusSignal.value === 'running' ? workspaceState.workspaceLink : ''}
+                      target={'_blank'}
+                  >
+                    {statusSignal.value === 'running' ? 'Začni písať test' : statusSignal.value}
+                  </a>
+
+                </div>
+              </div>
+              <div class="mt-8">
+                <a
+                    href={`${appUrl}student`}
+                    class="flex text-base font-semibold leading-7 text-indigo-400"
+                >
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6 mr-1"
+                  >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+                    />
+                  </svg>
+                  späť
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
   );
 });
 
@@ -212,13 +297,22 @@ const Clock = component$(() => {
   useVisibleTask$(({ cleanup }) => {
     const update = () => {
       const endDate = new Date(workspace.endDate);
-      time.value = new Date(endDate.getTime() - new Date().getTime()).toLocaleTimeString();
+      const timeToEnd =new Date(endDate.getTime() - new Date().getTime());
+      const hours = timeToEnd.getUTCHours() < 10 ? `0${timeToEnd.getUTCHours()}` : timeToEnd.getUTCHours();
+      const minutes = timeToEnd.getUTCMinutes() < 10 ? `0${timeToEnd.getUTCMinutes()}` : timeToEnd.getUTCMinutes();
+      const seconds = timeToEnd.getUTCSeconds() < 10 ? `0${timeToEnd.getUTCSeconds()}` : timeToEnd.getUTCSeconds();
+      time.value = `${hours}:${minutes}:${seconds}`;
+      if(endDate==new Date()){
+        location.reload()
+      }
     };
-    const id = setInterval(update, 5000);
+    const id = setInterval(update, 1000);
     cleanup(() => clearInterval(id));
   });
-  return <div>{time}</div>;
+  return <p>Zostávajúci čas: {time}</p>;
 });
+
+
 export const head: DocumentHead = {
   title: 'Test',
   meta: [

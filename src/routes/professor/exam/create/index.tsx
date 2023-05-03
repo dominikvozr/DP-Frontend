@@ -34,16 +34,11 @@ export function convertToGMT(inputTime: string): string {
   const [hours, minutes] = inputTime.split(':').map(Number);
 
   const now = new Date();
+  const dateString = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes).toUTCString();
 
-  const timezoneOffset = now.getTimezoneOffset();
-  const gmtTime = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes) - (timezoneOffset * 60 * 1000);
-  const gmtDate = new Date(gmtTime);
-
-  // Format the GMT time as a string in the input format and return it
-  const gmtHours = gmtDate.getUTCHours().toString().padStart(2, '0');
-  const gmtMinutes = gmtDate.getUTCMinutes().toString().padStart(2, '0');
-  return `${gmtHours}:${gmtMinutes}`;
+  return dateString.substring(dateString.indexOf(":")-2,dateString.lastIndexOf(":"))
 }
+
 
 export default component$(() => {
   const nav = useNavigate();
@@ -195,7 +190,7 @@ export default component$(() => {
                                 id="form14"
                                 onInput$={(ev: any) => {
                                   console.log(convertToGMT(ev.target.value));
-                                  state.startTime = convertToGMT(ev.target.value);
+                                  state.startTime = ev.target.value;
                                 }}
                               />
                               <label
@@ -248,7 +243,7 @@ export default component$(() => {
                                 data-te-toggle="timepicker"
                                 onInput$={(ev: any) => {
                                   console.log(convertToGMT(ev.target.value));
-                                  state.endTime = convertToGMT(ev.target.value);
+                                  state.endTime = ev.target.value;
                                 }}
                                 id="form14"
                               />
