@@ -74,7 +74,7 @@ export class CoderApi {
                     value: data.workSpaceDisk.toString()
                 },
                 {
-                    name: "git_repo",
+                    name: "Git repository",
                     value: git
                 },
             ]
