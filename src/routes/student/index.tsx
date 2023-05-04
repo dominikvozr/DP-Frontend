@@ -156,7 +156,7 @@ export default component$(() => {
             <div class="pl-4 pr-2 lg:w-96">
               <div class="pt-6 pb-2 flex space-x-1">
                 <h2 class="text-sm font-semibold">Activity</h2>
-                <span class="relative top-0.5 text-xs text-gray-500">{state.events && `(${state.events.length})`}</span>
+                <span class="relative top-0.5 text-xs text-gray-500">{state.events? `(${state.events.length})`: '(0)'}</span>
               </div>
               <div>
                 <ul role="list" class="divide-y divide-gray-200">
