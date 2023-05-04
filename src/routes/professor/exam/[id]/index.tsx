@@ -36,6 +36,7 @@ export default component$(() => {
     tabs: [
       { name: 'Profile', slug: 'profile', current: true },
       { name: 'Reports', slug: 'reports', current: false },
+      { name: 'Evaluation', slug: 'evaluation', current: false },
     ],
   });
   const state = useStore({
@@ -203,7 +204,7 @@ export default component$(() => {
                 {/* Profile header */}
                 {!_.isEmpty(state.test) && (
                   <>
-                    <div>
+                    <div class={profileTabs.active === 'evaluation'? 'hidden': ''}>
                       <div>
                         <img
                           class="h-32 w-full object-cover lg:h-48"
@@ -289,6 +290,9 @@ export default component$(() => {
                 )}
                 <div class="p-2 text-gray-600">
                   <div class={profileTabs.active !== 'profile' ? 'hidden' : ''}>
+                    <div>email: {state.test.user && state.test.user.email}</div>
+                  </div>
+                  <div class={profileTabs.active !== 'evaluation' ? 'hidden' : ''}>
                     <div>email: {state.test.user && state.test.user.email}</div>
                   </div>
                   <div class={`${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
