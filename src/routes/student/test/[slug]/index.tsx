@@ -17,6 +17,7 @@ import { ExamDataContext, TestDataContext, WorkspaceContext } from '~/contexts/c
 import { TestInvitation } from '~/components/test/testInvitation';
 import { TestClosed } from '~/components/test/testClosed';
 import _ from 'lodash';
+import {ExamApi} from "~/db/ExamApi";
 
 //Check authorisation
 export const onGet: RequestHandler = async ({ request, redirect, url }) => {
@@ -63,9 +64,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           data.exam.slug,
         cookie,
       );
-      const hours = Math.floor(workspaceStatus.ttl_ms / (1000 * 60 * 60));
-      const minutes = Math.floor((workspaceStatus.ttl_ms / (1000 * 60)) % 60);
-      console.log(hours, minutes)
+
       const accessData = await CoderApi.getSession(
         user.userObject.username,
           data.exam.slug,
@@ -73,8 +72,11 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
       );
 
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        const repo = `${data.user.gitea.username}/${data.exam.slug}`;
-        const workspace = await CoderApi.createWorkspace(data.exam, cookie, repo);
+
+        const workspace = await CoderApi.createWorkspace(data.user,data.exam, cookie);
+        const email = await CoderApi.sentEmailWithLoginData(cookie);
+        console.log(workspace)
+        console.log(email)
         const accessData = await CoderApi.getSession(
           user.userObject.username,
             data.exam.slug,
@@ -194,6 +196,17 @@ const TestShow = component$(() => {
     const tmrId = setInterval(update, 1000);
     cleanup(() => clearInterval(tmrId));
   });
+  const emailSent =useSignal(false)
+  useVisibleTask$(({ cleanup }) => {
+    const update = () => {
+      if(emailSent.value){
+        emailSent.value=false
+      }
+
+    };
+    const id = setInterval(update, 120_000);
+    cleanup(() => clearInterval(id));
+  });
 
   const examData = useContext(ExamDataContext);
   return (
@@ -235,10 +248,24 @@ const TestShow = component$(() => {
               </p>
               <h1 class="text-base font-semibold leading-7 text-indigo-400"><Clock></Clock></h1>
               <div>
-                <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl"><span
-                    class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-1xl">email:</span> {workspaceState.email}</p>
-                <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl"><span
-                    class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-1xl">heslo:</span> {workspaceState.password}</p>
+                {/*<p class="text-base font-semibold leading-7 text-white">Skontrolujte email: </p>*/}
+                <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl">{workspaceState.email}</p>
+                <div class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl">
+                  <button
+                      disabled={emailSent.value}
+                      onClick$={async () => {
+                        //const { value } = await handleCreate.run(state);
+                        const res = await CoderApi.sentEmailWithLoginData(workspaceState.cookie);
+                        console.log(res);
+
+                        if (res.response?.startsWith('250')){
+                          emailSent.value=true
+                        };
+                      }}
+                      class={emailSent.value ? "inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm" :"inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"}
+                  >
+                    {emailSent.value ? "Údaje poslané": "Znova poslať údaje"}
+                  </button></div>
               </div>
               <p class="relative mt-6 text-base leading-7 text-gray-300 pb-5">
                 {examData.exam.description}
