@@ -7,4 +7,5 @@ export const eventClassMapping: EventClassMapping = {
   report: 'bg-yellow-300',
   evaluationStarted: 'bg-orange-300',
   evaluationEnded: 'bg-green-300',
+  evaluationChanged: 'bg-rose-300',
 };
