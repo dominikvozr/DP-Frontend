@@ -87,7 +87,7 @@ export class CoderApi {
                 ttl_ms: ttl_ms,
                 rich_parameter_values: params
             }
-
+            console.log(body)
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',
