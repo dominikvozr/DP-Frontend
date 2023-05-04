@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { component$, useStore, useSignal, useTask$ } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, routeAction$, useNavigate } from '@builder.io/qwik-city';
 import { PipelineApi } from '~/db/PipelineApi';
@@ -185,7 +186,7 @@ export default component$(() => {
                         onClick$={async () => {
                           //const { value } = await handleCreate.run(state);
                           const response = await PipelineApi.createPipeline(state);
-                          if (response.message === 'success') nav(`${appUrl}professor`);
+                          if (response.message === 'success') window.location = `${appUrl}professor` as any;
                           // if (response.message === 'success') nav(`${appUrl}professor`);
                           // handleUpload(ev.target.files[0]);
                         }}

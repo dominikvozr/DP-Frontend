@@ -34,11 +34,16 @@ export function convertToGMT(inputTime: string): string {
   const [hours, minutes] = inputTime.split(':').map(Number);
 
   const now = new Date();
-  const dateString = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes).toUTCString();
+  const dateString = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hours,
+    minutes,
+  ).toUTCString();
 
-  return dateString.substring(dateString.indexOf(":")-2,dateString.lastIndexOf(":"))
+  return dateString.substring(dateString.indexOf(':') - 2, dateString.lastIndexOf(':'));
 }
-
 
 export default component$(() => {
   const nav = useNavigate();
@@ -435,8 +440,8 @@ export default component$(() => {
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
                             <option
-                                value="c4496287-7799-4996-a0f0-46003bda3a51"
-                                selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
+                              value="c4496287-7799-4996-a0f0-46003bda3a51"
+                              selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
                             >
                               default
                             </option>
@@ -622,9 +627,8 @@ export default component$(() => {
                           onClick$={async () => {
                             //const { value } = await handleCreate.run(state);
                             const res = await ExamApi.createExam(state);
-                            console.log(res);
-
-                            if (res.message === 'success') await nav(`${appUrl}professor`);
+                            if (res.message === 'success')
+                              window.location = `${appUrl}professor` as any;
                           }}
                           class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { component$, useStore, useTask$, useContextProvider } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import { DocumentHead, RequestHandler, routeLoader$, useLocation, useNavigate } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
 import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
 import CommandLineIcon from '@heroicons/react/20/solid/CommandLineIcon';
@@ -30,11 +30,13 @@ export const useExamData = routeLoader$(async ({ params, request }) => {
 
 export default component$(() => {
   const nav = useNavigate();
+  const loc = useLocation();
   const profileTabs = useStore({
     active: 'profile',
     tabs: [
       { name: 'Profile', slug: 'profile', current: true },
       { name: 'Reports', slug: 'reports', current: false },
+      { name: 'Evaluation', slug: 'evaluation', current: false },
     ],
   });
   const state = useStore({
@@ -53,7 +55,17 @@ export default component$(() => {
   });
 
   useTask$(async () => {
-    state.test = !_.isEmpty(dataResource.value.tests) ? dataResource.value.tests[0] : {};
+    if (!loc.url.searchParams.has('email'))
+      state.test = !_.isEmpty(dataResource.value.tests) ? dataResource.value.tests[0] : {};
+
+    dataResource.value.tests.map((test: any) => {
+      if (test.user.email == loc.url.searchParams.get('email'))
+      state.test = test
+    })
+
+    if(loc.url.searchParams.has('tab'))
+      profileTabs.active = loc.url.searchParams.get('tab') || 'profile'
+
     state.testOrder = 0;
     state.startDate = new Date(dataResource.value.exam.startDate);
     state.endDate = new Date(dataResource.value.exam.endDate);
@@ -71,7 +83,7 @@ export default component$(() => {
   return (
     <>
       <ExamModal />
-      <div class="flex h-full">
+      <div class="flex border-t border-indigo-700 h-full">
         <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div class="py-2 min-w-0 border-b border-indigo-800 bg-indigo-600">
             <nav class="flex justify-between w-full px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
@@ -192,7 +204,7 @@ export default component$(() => {
                 {/* Profile header */}
                 {!_.isEmpty(state.test) && (
                   <>
-                    <div>
+                    <div class={profileTabs.active === 'evaluation'? 'hidden': ''}>
                       <div>
                         <img
                           class="h-32 w-full object-cover lg:h-48"
@@ -280,30 +292,31 @@ export default component$(() => {
                   <div class={profileTabs.active !== 'profile' ? 'hidden' : ''}>
                     <div>email: {state.test.user && state.test.user.email}</div>
                   </div>
+                  <div class={profileTabs.active !== 'evaluation' ? 'hidden' : ''}>
+                    <div>email: {state.test.user && state.test.user.email}</div>
+                  </div>
                   <div class={`${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
                     {/* {JSON.stringify(state.test.reports)} */}
-                    {state.test.reports && state.test.reports.map((report: any, index: number) => {
-                      if (report.isOpen)
-                        return (
-                          <>
-                            <div key={index} class={`grid grid-cols-12 ${state.savedHide.includes(report._id) ? 'hidden': ''}`}>
-                              <div class="col-span-2">{report.message}:</div>
-                              <input
-                                class="col-span-4"
-                                type="text"
-                                value={report.value}
-                                onInput$={(evt: any) => {
-                                  if (!evt.target.value) {
-                                    delete state.replies[report._id]
-                                    return
-                                  }
-                                  state.replies[report._id] = evt.target.value;
-                                }}
-                              />
-                            </div>
-                          </>
-                        );
-                    })}
+                    {state.test.reports && state.test.reports.map((report: any, index: number) => (
+                        <>
+                          <div key={index} class={`grid grid-cols-12 ${state.savedHide.includes(report._id) ? 'hidden': ''}`}>
+                            <div class="col-span-2">{report.message}:</div>
+                            <input
+                              class="col-span-4"
+                              type="text"
+                              value={report.value}
+                              onInput$={(evt: any) => {
+                                if (!evt.target.value) {
+                                  delete state.replies[report._id]
+                                  return
+                                }
+                                state.replies[report._id] = evt.target.value;
+                              }}
+                            />
+                          </div>
+                        </>
+                      )
+                    )}
                     <button
                       type="submit"
                       class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
