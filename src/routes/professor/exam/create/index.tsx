@@ -59,7 +59,7 @@ export default component$(() => {
     tests: [] as any,
     testsFile: {} as any,
     pipeline: '',
-    templateId: 'c4496287-7799-4996-a0f0-46003bda3a51',
+    templateId: '6aa4e225-9fa5-4c03-aa7c-f393ea7a110b',
     points: 0,
     workSpaceCPU: 2,
     workSpaceMemory: 2,
