@@ -56,6 +56,9 @@ export default component$(() => {
     pipeline: '',
     templateId: 'c4496287-7799-4996-a0f0-46003bda3a51',
     points: 0,
+    workSpaceCPU: 2,
+    workSpaceMemory: 2,
+    workSpaceDisk:2,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
@@ -448,6 +451,120 @@ export default component$(() => {
                       </div>
                     </div>
                   </div>
+                  <div class="bg-white px-4 py-5 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2">
+                      <div class="flex sm:pt-5">
+                        <label
+                            for="workSpaceCPU"
+                            class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
+                        >
+                          Veľkosť CPU (GB)
+                        </label>
+                        <div class="mt-1 sm:mt-0">
+                          <select
+                              onChange$={(evt) => {
+                                state.workSpaceCPU = Number(evt.target.value);
+                              }}
+                              id="template"
+                              name="template"
+                              class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
+                          >
+                            <option
+                                value="2"
+                                selected={state.workSpaceCPU === 2}
+                            >
+                              2
+                            </option>
+                            <option
+                                value="4"
+                                selected={state.workSpaceCPU === 4}
+                            >
+                              4
+                            </option>
+                            <option
+                                value="6"
+                                selected={state.workSpaceCPU === 6}
+                            >
+                              6
+                            </option>
+                          <option
+                              value="8"
+                              selected={state.workSpaceCPU === 8}
+                          >
+                            8
+                          </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="flex sm:pt-5">
+                        <label
+                            for="workSpaceCPU"
+                            class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
+                        >
+                          Veľkosť RAM (GB)
+                        </label>
+                        <div class="mt-1 sm:mt-0">
+                          <select
+                              onChange$={(evt) => {
+                                state.workSpaceMemory = Number(evt.target.value);
+                              }}
+                              id="template"
+                              name="template"
+                              class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
+                          >
+                            <option
+                                value="2"
+                                selected={state.workSpaceMemory === 2}
+                            >
+                              2
+                            </option>
+                            <option
+                                value="4"
+                                selected={state.workSpaceMemory === 4}
+                            >
+                              4
+                            </option>
+                            <option
+                                value="6"
+                                selected={state.workSpaceMemory === 6}
+                            >
+                              6
+                            </option>
+                            <option
+                                value="8"
+                                selected={state.workSpaceMemory === 8}
+                            >
+                              8
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="flex mt-12 justify-end">
+                        <label
+                            for="workSpaceDisk"
+                            class="block mt-2 text-sm w-72 font-medium text-gray-700 self-center sm:mt-px text-md tracking-wider"
+                        >
+                        Veľkosť disku (GB)
+                        </label>
+                        <input
+                            type="number"
+                            step={1}
+                            min={1}
+                            max={9999}
+                            name="workSpaceDisk"
+                            id="workSpaceDisk"
+                            onInput$={(ev: any) => {
+                              if(ev.target.value<1){
+                                ev.target.value = undefined
+                              }
+                              state.workSpaceDisk = Number(ev.target.value);
+                            }}
+                            class="mt-1 block w-48 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
               </div>
             </div>
@@ -507,7 +624,7 @@ export default component$(() => {
                             const res = await ExamApi.createExam(state);
                             console.log(res);
 
-                            if (res.message === 'success') nav(`${appUrl}professor`);
+                            if (res.message === 'success') await nav(`${appUrl}professor`);
                           }}
                           class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
