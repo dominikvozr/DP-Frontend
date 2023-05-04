@@ -64,7 +64,6 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           data.exam.slug,
         cookie,
       );
-
       const accessData = await CoderApi.getSession(
         user.userObject.username,
           data.exam.slug,
@@ -75,8 +74,6 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
 
         const workspace = await CoderApi.createWorkspace(data.user,data.exam, cookie);
         const email = await CoderApi.sentEmailWithLoginData(cookie);
-        console.log(workspace)
-        console.log(email)
         const accessData = await CoderApi.getSession(
           user.userObject.username,
             data.exam.slug,
