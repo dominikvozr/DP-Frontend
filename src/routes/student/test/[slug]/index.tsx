@@ -258,7 +258,7 @@ const TestShow = component$(() => {
                         const res = await CoderApi.sentEmailWithLoginData(workspaceState.cookie);
                         console.log(res);
 
-                        if (res.response.startsWith('250')){
+                        if (res.response?.startsWith('250')){
                           emailSent.value=true
                         };
                       }}

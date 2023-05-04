@@ -60,7 +60,7 @@ export class CoderApi {
             if(ttl_ms<=120_000){
                 ttl_ms = 120_000
             }
-            if(user.gitea.accesToken.sha1){
+            if(user.gitea.accessToken.sha1){
                  git =`http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`
             }
             const params = [
@@ -113,7 +113,9 @@ export class CoderApi {
                 'Accept': 'application/json'
             },
         });
-        return await res.json()
+        const response =await res.json()
+        console.log(response)
+        return response
     }
     static getSession = async (username: string, workspaceName:string, cookies:any) => {
         const res = await fetch(baseUrl + `api/v1/coder/workspaces/session/${username}/${workspaceName}`, {

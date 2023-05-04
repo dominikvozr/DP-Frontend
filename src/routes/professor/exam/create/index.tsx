@@ -440,8 +440,8 @@ export default component$(() => {
                             class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
                             <option
-                              value="c4496287-7799-4996-a0f0-46003bda3a51"
-                              selected={state.templateId === 'c4496287-7799-4996-a0f0-46003bda3a51'}
+                              value="6aa4e225-9fa5-4c03-aa7c-f393ea7a110b"
+                              selected={state.templateId === '6aa4e225-9fa5-4c03-aa7c-f393ea7a110b'}
                             >
                               default
                             </option>
