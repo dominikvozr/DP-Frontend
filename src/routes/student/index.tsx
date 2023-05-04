@@ -163,28 +163,30 @@ export default component$(() => {
                   {state.events &&
                     state.events.map(async (event: any, index: number) => {
                       if (index < state.maxEvents) return (
-                          <li
-                            key={index}
-                            class={`p-4 my-1.5 rounded-lg ${await getEventClass(event.type)}`}
-                          >
-                            <div class="flex space-x-3">
-                              {event.fromUser && (
-                                <img
-                                  class="h-6 w-6 rounded-full"
-                                  src={event.fromUser.avatarUrl}
-                                  alt="avatar"
-                                />
-                              )}
-                              <div class="flex-1 space-y-1">
-                                <div class="flex items-center justify-between">
-                                  <h3 class="text-sm font-medium truncate">{event.name}</h3>
-                                  <p class="text-sm text-gray-500">
-                                    {dateDifference(nowDate, new Date(event.createdAt))}
-                                  </p>
-                                </div>
-                              <p class="text-sm text-gray-500 truncate">{event.description} {event.link && (<a href={appUrl + event.link}>view</a>)}</p>
+                        <li
+                          key={index}
+                          class={`p-4 my-1.5 rounded-lg ${await getEventClass(event.type)}`}
+                        >
+                          <div class="flex space-x-3">
+                            {event.fromUser && (
+                              <img
+                                class="h-6 w-6 rounded-full self-center"
+                                src={event.fromUser.avatarUrl}
+                                alt="avatar"
+                              />
+                            )}
+                            <div class="flex-1 flex flex-col justify-center truncate">
+                              <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-medium truncate">{event.name}</h3>
+                                <p class="text-sm text-gray-500">
+                                  {dateDifference(nowDate, new Date(event.createdAt))}
+                                </p>
                               </div>
+                              <p class="text-sm text-gray-500 truncate">{event.description}</p>
+                            </div>
+                            <div class="flex flex-col">
                               <button
+                                class="self-center bg-white px-1.5 my-1 text-sm rounded-lg"
                                 onClick$={async () => {
                                   const res: Response | undefined = await EventApi.hideEvent(
                                     event._id,
@@ -198,8 +200,8 @@ export default component$(() => {
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke-width="1.5"
-                                  stroke="currentColor"
-                                  class="w-6 h-6"
+                                  stroke="#DC2626"
+                                  class="w-5 h-5"
                                 >
                                   <path
                                     stroke-linecap="round"
@@ -208,9 +210,17 @@ export default component$(() => {
                                   />
                                 </svg>
                               </button>
+                              {event.link && (
+                                <a class="bg-white px-1.5 my-1 text-sm rounded-lg" href={appUrl + event.link}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                  </svg>
+                                </a>
+                              )}
                             </div>
-                          </li>
-                        );
+                          </div>
+                        </li>
+                      );
                     })}
                   {!state.events && (<>
                     no activity :(
