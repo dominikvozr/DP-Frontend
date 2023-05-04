@@ -61,7 +61,7 @@ export class CoderApi {
                 ttl_ms = 120_000
             }
             if(user.gitea.accesToken.sha1){
-                 git =`http://${user.gitea.accesToken.sha1}@bawix.xyz:81/gitea/${repo}`
+                 git =`http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`
             }
             const params = [
                 {
