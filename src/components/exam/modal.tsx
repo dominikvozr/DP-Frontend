@@ -47,7 +47,7 @@ export const ExamModal = component$(() => {
                   <div class="flex justify-center space-x-2 text-sm text-gray-500 py-2 border-t-2">
                     <div class="self-center">Tests:</div>
                     <div>
-                      {examModalData.exam.tests.map((test) => {
+                      {examModalData.exam.tests.map((test: any) => {
                         return(<div key={test.id} class="text-left">name: {test.name} value: {test.points}</div>)
                       })}
                     </div>
