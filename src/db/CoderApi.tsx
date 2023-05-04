@@ -50,7 +50,7 @@ export class CoderApi {
             const endDate = new Date(data.endDate);
             let startDate = new Date(data.startDate)
             const repo = `${user.gitea.username}/${data.slug}-exam`;
-            let git = "";
+            const git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
 
             if(startDate.getTime()<= new Date().getTime()){
                 startDate = new Date()
@@ -59,9 +59,6 @@ export class CoderApi {
             let ttl_ms = Math.round(endDate.getTime() - startDate.getTime());
             if(ttl_ms<=120_000){
                 ttl_ms = 120_000
-            }
-            if(user.gitea.accessToken.sha1){
-                 git =`http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`
             }
             const params = [
                 {
@@ -83,9 +80,9 @@ export class CoderApi {
             ]
             const body = {
                 name: data.slug,
-                template_id: data.templateId,
+                rich_parameter_values: params,
                 ttl_ms: ttl_ms,
-                rich_parameter_values: params
+                template_id: data.templateId,
             }
             console.log(body)
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
