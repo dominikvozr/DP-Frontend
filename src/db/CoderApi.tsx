@@ -62,15 +62,15 @@ export class CoderApi {
             }
             const params = [
                 {
-                    name: "cpu",
+                    name: `${data.workSpaceCPU} Cores`,
                     value: data.workSpaceCPU.toString()
                 },
                 {
-                    name: "memory",
+                    name: `${data.workSpaceMemory} GB`,
                     value: data.workSpaceMemory.toString()
                 },
                 {
-                    name: "home_disk_size",
+                    name: "Home Disk Size (GB)",
                     value: data.workSpaceDisk.toString()
                 },
                 {
