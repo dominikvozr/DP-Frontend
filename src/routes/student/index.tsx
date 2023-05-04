@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { qwikify$ } from '@builder.io/qwik-react';
-import { component$, useStore } from '@builder.io/qwik';
+import { component$, useStore, $ } from '@builder.io/qwik';
 import RectangleStackIcon from '@heroicons/react/20/solid/RectangleStackIcon';
 import CheckBadgeIcon from '@heroicons/react/20/solid/CheckBadgeIcon';
 import { DocumentHead, RequestHandler, routeLoader$ } from '@builder.io/qwik-city';
@@ -7,12 +8,21 @@ import { TestApi } from '~/db/TestApi';
 import { TestItem } from '~/components/student/TestItem';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
-import {CoderApi} from "~/db/CoderApi";
-
+import { CoderApi } from '~/db/CoderApi';
+import { EventApi } from '~/db/EventApi';
+import { dateDifference } from '~/helpers/dateHelper';
+import { eventClassMapping } from '~/helpers/eventClassMapping';
 
 export const useTestsData = routeLoader$(async ({ request }) => {
   const data = await TestApi.getTests(request.headers.get('cookie'));
   return { tests: data?.tests, user: data?.user, isAuthorized: data?.isAuthorized };
+});
+
+export const useEventsData = routeLoader$(async ({ request }) => {
+  const data = await EventApi.getEvents(request.headers.get('cookie'));
+  return {
+    events: data.events,
+  };
 });
 
 export const onGet: RequestHandler = async ({ request, redirect, url }) => {
@@ -26,15 +36,19 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 };
 
 export default component$(() => {
+  const eventsResource = useEventsData();
   const state = useStore({
     examCode: '',
+    events: eventsResource.value.events,
+    maxEvents: 8,
   });
   const dataResource = useTestsData();
   const QCheckBadgeIcon = qwikify$(CheckBadgeIcon);
   const QRectangleStackIcon = qwikify$(RectangleStackIcon);
-  const activityItems = [
-    { project: 'Workcation', commit: '2d89f0c8', environment: 'production', time: '1h' },
-  ];
+  const nowDate = new Date();
+  const getEventClass = $((type: string): string => {
+    return eventClassMapping[type] || 'bg-gray-500'; // Fallback to a default class if the type is not found
+  });
   return (
     <>
       {/* Background color split screen for large screens */}
@@ -138,40 +152,70 @@ export default component$(() => {
             </div>
           </div>
           {/* Activity feed */}
-          <div class="bg-gray-50 pr-4 sm:pr-6 lg:flex-shrink-0 lg:border-l lg:border-gray-200 lg:pr-8 xl:pr-0">
-            <div class="pl-6 lg:w-80">
-              <div class="pt-6 pb-2">
+          <div class="pr-4 sm:pr-6 lg:flex-shrink-0 lg:border-l lg:border-gray-200 lg:pr-8 xl:pr-0">
+            <div class="pl-4 pr-2 lg:w-96">
+              <div class="pt-6 pb-2 flex space-x-1">
                 <h2 class="text-sm font-semibold">Activity</h2>
+                <span class="relative top-0.5 text-xs text-gray-500">{`(${state.events.length})`}</span>
               </div>
               <div>
                 <ul role="list" class="divide-y divide-gray-200">
-                  {activityItems.map((item) => (
-                    <li key={item.commit} class="py-4">
-                      <div class="flex space-x-3">
-                        <img
-                          class="h-6 w-6 rounded-full"
-                          src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&h=256&q=80"
-                          alt=""
-                        />
-                        <div class="flex-1 space-y-1">
-                          <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-medium">You</h3>
-                            <p class="text-sm text-gray-500">{item.time}</p>
-                          </div>
-                          <p class="text-sm text-gray-500">
-                            Deployed {item.project} ({item.commit} in master) to {item.environment}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
+                  {state.events &&
+                    state.events.map(async (event: any, index: number) => {
+                      if (index < state.maxEvents) return (
+                          <li
+                            key={index}
+                            class={`p-4 my-1.5 rounded-lg ${await getEventClass(event.type)}`}
+                          >
+                            <div class="flex space-x-3">
+                              {event.fromUser && (
+                                <img
+                                  class="h-6 w-6 rounded-full"
+                                  src={event.fromUser.avatarUrl}
+                                  alt="avatar"
+                                />
+                              )}
+                              <div class="flex-1 space-y-1">
+                                <div class="flex items-center justify-between">
+                                  <h3 class="text-sm font-medium truncate">{event.name}</h3>
+                                  <p class="text-sm text-gray-500">
+                                    {dateDifference(nowDate, new Date(event.createdAt))}
+                                  </p>
+                                </div>
+                              <p class="text-sm text-gray-500 truncate">{event.description} {event.link && (<a href={appUrl + event.link}>view</a>)}</p>
+                              </div>
+                              <button
+                                onClick$={async () => {
+                                  const res: Response | undefined = await EventApi.hideEvent(
+                                    event._id,
+                                  );
+                                  if (res && res.status == 200)
+                                    state.events = state.events.filter((evt: any) => evt._id !== event._id)
+                                }}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke-width="1.5"
+                                  stroke="currentColor"
+                                  class="w-6 h-6"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          </li>
+                        );
+                    })}
+                  {!state.events && (<>
+                    no activity :(
+                  </>)}
                 </ul>
-                <div class="border-t border-gray-200 py-4 text-sm">
-                  <a href="#" class="font-semibold text-blue-600 hover:text-blue-900">
-                    View all activity
-                    <span aria-hidden="true"> &rarr;</span>
-                  </a>
-                </div>
               </div>
             </div>
           </div>
