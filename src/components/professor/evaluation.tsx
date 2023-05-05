@@ -12,8 +12,8 @@ export const Evaluation = component$<EvaluationProps>((props) => {
     message: '',
     loading: false,
     alert: false,
-    points: props.test.score.points,
-    percentage: (props.test.score.points / props.exam.points) * 100,
+    points: props.test.score ? props.test.score.points : 0,
+    percentage: props.test.score ? (props.test.score.points / props.exam.points) * 100 : 0,
   });
 
   const recalculateScore = $(() => {

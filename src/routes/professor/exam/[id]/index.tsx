@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { component$, useStore, useTask$, useContextProvider } from '@builder.io/qwik';
-import { DocumentHead, RequestHandler, routeLoader$, useLocation, useNavigate } from '@builder.io/qwik-city';
+import { DocumentHead, RequestHandler, routeLoader$, useLocation } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
 import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
 import CommandLineIcon from '@heroicons/react/20/solid/CommandLineIcon';
@@ -30,7 +30,6 @@ export const useExamData = routeLoader$(async ({ params, request }) => {
 });
 
 export default component$(() => {
-  const nav = useNavigate();
   const loc = useLocation();
   const profileTabs = useStore({
     active: 'profile',
@@ -242,7 +241,7 @@ export default component$(() => {
                         </>
                       )
                     )}
-                    { state.test.reports.length? (<button
+                    { state.test.reports ? (<button
                       type="submit"
                       class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       onClick$={async () => {
@@ -257,7 +256,7 @@ export default component$(() => {
                 </div>
               </article>
             </main>
-            <aside class={`md:w-64 lg:w-96 flex-shrink-0 border-r border-gray-200 order-first flex flex-col ${profileTabs.active === 'evaluation' ? 'md:w-36 lg:w-56' : ''}`}>
+            <aside class={`flex-shrink-0 border-r border-gray-200 order-first flex flex-col ${profileTabs.active === 'evaluation' ? 'md:w-36 lg:w-56' : 'md:w-64 lg:w-96'}`}>
               <div class="px-6 pt-6 pb-4">
                 <h2 class="text-lg font-medium text-gray-900">Students</h2>
                 <p class="mt-1 text-sm text-gray-600">Active: {dataResource.value.tests.length}</p>
