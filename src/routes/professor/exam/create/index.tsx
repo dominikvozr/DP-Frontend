@@ -68,7 +68,10 @@ export default component$(() => {
 
   const loading = useSignal<boolean>(false);
   const recalculatePoints = $(() => {
-    state.points = state.tests.reduce((acc: any, obj: any) => acc + obj.points, 0) || 0;
+    state.points = 0
+    for (const test of state.tests) {
+      state.points += test.tests.reduce((acc: any, obj: any) => acc + (obj.points ? obj.points : 0), 0) || 0;
+    }
   });
 
   const pipelinesData = usePipelinesData();
@@ -300,7 +303,7 @@ export default component$(() => {
                                     onChange$={async (ev: any) => {
                                       const data = await ExamApi.uploadExamProject(
                                         'project',
-                                        ev.target.files[0],
+                                        ev.target.files,
                                       );
                                       state.project = data;
                                     }}
@@ -544,7 +547,7 @@ export default component$(() => {
           </div>
 
           {state.tests.length
-            ? state.tests.map((testsFile: { testsFile: any; tests: any }) => (
+            ? state.tests.map((testsFile: { testsFile: any; tests: any }, index: number) => (
                 <>
                   <div class="hidden sm:block" aria-hidden="true">
                     <div class="py-5">
@@ -566,7 +569,7 @@ export default component$(() => {
                       <div class="mt-5 md:col-span-2 md:mt-0">
                         <div class="overflow-hidden shadow sm:rounded-md">
                           <div class="bg-white px-4 py-5 sm:p-6">
-                            {testsFile.tests?.map((exam: any) => {
+                            {testsFile.tests?.map((exam: any, idx: number) => {
                               return (
                                 <div
                                   key={exam._id}
@@ -584,7 +587,7 @@ export default component$(() => {
                                     name="name"
                                     id="name"
                                     onInput$={(ev: any) => {
-                                      testsFile.tests[exam.id - 1].points = parseFloat(
+                                      state.tests[index].tests[idx].points = parseFloat(
                                         ev.target.value,
                                       );
                                       recalculatePoints();
