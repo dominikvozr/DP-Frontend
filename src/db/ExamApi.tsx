@@ -88,10 +88,12 @@ export class ExamApi {
     }
   };
 
-  static uploadExamProject = async (destination: string, file: File) => {
+  static uploadExamProject = async (destination: string, files: File[]) => {
     try {
       const formData = new FormData();
-      formData.append(destination, file);
+      for (const file of files) {
+        formData.append(destination, file);
+      }
       const res = await fetch(`${baseUrl}api/v1/professor/exam/upload/${destination}`, {
         method: 'POST',
         credentials: 'include',

@@ -1,10 +1,10 @@
+/* eslint-disable prettier/prettier */
 import { component$, useStore, $, useSignal, useTask$, useVisibleTask$ } from '@builder.io/qwik';
 import {
   DocumentHead,
   RequestHandler,
   routeAction$,
   routeLoader$,
-  useNavigate,
 } from '@builder.io/qwik-city';
 import _ from 'lodash';
 import { ExamApi } from '~/db/ExamApi';
@@ -46,7 +46,6 @@ export function convertToGMT(inputTime: string): string {
 }
 
 export default component$(() => {
-  const nav = useNavigate();
   const state = useStore({
     name: '',
     description: '',
@@ -57,13 +56,13 @@ export default component$(() => {
     endTime: '',
     project: {} as any,
     tests: [] as any,
-    testsFile: {} as any,
     pipeline: '',
+    mainFile: '',
     templateId: '6aa4e225-9fa5-4c03-aa7c-f393ea7a110b',
     points: 0,
     workSpaceCPU: 2,
     workSpaceMemory: 2,
-    workSpaceDisk:2,
+    workSpaceDisk: 2,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
@@ -338,28 +337,22 @@ export default component$(() => {
                                   class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                                 >
                                   <span>Nahraj testy</span>
-                                  <div>{state.tests && `${state.testsFile.name}`}</div>
+                                  <div>{state.tests /* && `${state.testsFile.name}` */}</div>
                                   <input
                                     id="tests"
                                     name="tests"
+                                    multiple
                                     onInput$={async (ev: any) => {
-                                      /* const { value } = await handleUpload.run(
-                                        'tests',
-                                        ev.target.files[0],
-                                      ); */
                                       const data = await ExamApi.uploadExamProject(
                                         'tests',
-                                        ev.target.files[0],
+                                        ev.target.files,
                                       );
-                                      state.tests = data.matches;
-                                      state.testsFile = data.file;
-                                      // handleUpload(ev.target.files[0]);
+                                      state.tests = data.files;
                                     }}
                                     type="file"
                                     class="sr-only"
                                   />
                                 </label>
-                                {/* <p class="pl-1">alebo presuň</p> */}
                               </div>
                             </div>
                           </div>
@@ -460,85 +453,61 @@ export default component$(() => {
                     <div class="grid grid-cols-1 md:grid-cols-2">
                       <div class="flex sm:pt-5">
                         <label
-                            for="workSpaceCPU"
-                            class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
+                          for="workSpaceCPU"
+                          class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
                         >
                           Veľkosť CPU (GB)
                         </label>
                         <div class="mt-1 sm:mt-0">
                           <select
-                              onChange$={(evt) => {
-                                state.workSpaceCPU = Number(evt.target.value);
-                              }}
-                              id="template"
-                              name="template"
-                              class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
+                            onChange$={(evt) => {
+                              state.workSpaceCPU = Number(evt.target.value);
+                            }}
+                            id="template"
+                            name="template"
+                            class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
-                            <option
-                                value="2"
-                                selected={state.workSpaceCPU === 2}
-                            >
+                            <option value="2" selected={state.workSpaceCPU === 2}>
                               2
                             </option>
-                            <option
-                                value="4"
-                                selected={state.workSpaceCPU === 4}
-                            >
+                            <option value="4" selected={state.workSpaceCPU === 4}>
                               4
                             </option>
-                            <option
-                                value="6"
-                                selected={state.workSpaceCPU === 6}
-                            >
+                            <option value="6" selected={state.workSpaceCPU === 6}>
                               6
                             </option>
-                          <option
-                              value="8"
-                              selected={state.workSpaceCPU === 8}
-                          >
-                            8
-                          </option>
+                            <option value="8" selected={state.workSpaceCPU === 8}>
+                              8
+                            </option>
                           </select>
                         </div>
                       </div>
                       <div class="flex sm:pt-5">
                         <label
-                            for="workSpaceCPU"
-                            class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
+                          for="workSpaceCPU"
+                          class="block text-sm font-medium text-gray-700 pr-4 sm:mt-px sm:pt-2 self-center"
                         >
                           Veľkosť RAM (GB)
                         </label>
                         <div class="mt-1 sm:mt-0">
                           <select
-                              onChange$={(evt) => {
-                                state.workSpaceMemory = Number(evt.target.value);
-                              }}
-                              id="template"
-                              name="template"
-                              class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
+                            onChange$={(evt) => {
+                              state.workSpaceMemory = Number(evt.target.value);
+                            }}
+                            id="template"
+                            name="template"
+                            class="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
                           >
-                            <option
-                                value="2"
-                                selected={state.workSpaceMemory === 2}
-                            >
+                            <option value="2" selected={state.workSpaceMemory === 2}>
                               2
                             </option>
-                            <option
-                                value="4"
-                                selected={state.workSpaceMemory === 4}
-                            >
+                            <option value="4" selected={state.workSpaceMemory === 4}>
                               4
                             </option>
-                            <option
-                                value="6"
-                                selected={state.workSpaceMemory === 6}
-                            >
+                            <option value="6" selected={state.workSpaceMemory === 6}>
                               6
                             </option>
-                            <option
-                                value="8"
-                                selected={state.workSpaceMemory === 8}
-                            >
+                            <option value="8" selected={state.workSpaceMemory === 8}>
                               8
                             </option>
                           </select>
@@ -546,98 +515,138 @@ export default component$(() => {
                       </div>
                       <div class="flex mt-12 justify-end">
                         <label
-                            for="workSpaceDisk"
-                            class="block mt-2 text-sm w-72 font-medium text-gray-700 self-center sm:mt-px text-md tracking-wider"
+                          for="workSpaceDisk"
+                          class="block mt-2 text-sm w-72 font-medium text-gray-700 self-center sm:mt-px text-md tracking-wider"
                         >
-                        Veľkosť disku (GB)
+                          Veľkosť disku (GB)
                         </label>
                         <input
-                            type="number"
-                            step={1}
-                            min={1}
-                            max={9999}
-                            name="workSpaceDisk"
-                            id="workSpaceDisk"
-                            onInput$={(ev: any) => {
-                              if(ev.target.value<1){
-                                ev.target.value = undefined
-                              }
-                              state.workSpaceDisk = Number(ev.target.value);
-                            }}
-                            class="mt-1 block w-48 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          type="number"
+                          step={1}
+                          min={1}
+                          max={9999}
+                          name="workSpaceDisk"
+                          id="workSpaceDisk"
+                          onInput$={(ev: any) => {
+                            if (ev.target.value < 1) {
+                              ev.target.value = undefined;
+                            }
+                            state.workSpaceDisk = Number(ev.target.value);
+                          }}
+                          class="mt-1 block w-48 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {state.tests.length
+            ? state.tests.map((testsFile: { testsFile: any; tests: any }) => (
+                <>
+                  <div class="hidden sm:block" aria-hidden="true">
+                    <div class="py-5">
+                      <div class="border-t border-gray-200"></div>
+                    </div>
+                  </div>
+                  <div class="mt-10 sm:mt-0">
+                    <div class="md:grid md:grid-cols-3 md:gap-6">
+                      <div class="md:col-span-1">
+                        <div class="px-4 sm:px-0">
+                          <h3 class="text-lg font-medium leading-6 text-gray-900">
+                            Testy - {testsFile.testsFile.originalname}
+                          </h3>
+                          <p class="mt-1 text-sm text-gray-600">
+                            Definujte body za jednotlivé testové funkcie.
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-5 md:col-span-2 md:mt-0">
+                        <div class="overflow-hidden shadow sm:rounded-md">
+                          <div class="bg-white px-4 py-5 sm:p-6">
+                            {testsFile.tests?.map((exam: any) => {
+                              return (
+                                <div
+                                  key={exam._id}
+                                  class="flex align-middle justify-between space-x-4"
+                                >
+                                  <label
+                                    for="name"
+                                    class="block text-sm w-72 font-medium text-gray-700 self-center text-md tracking-wider"
+                                  >
+                                    <span class="text-lg font-bold">{exam.id}</span> {exam.name}
+                                  </label>
+                                  <input
+                                    type="number"
+                                    step={0.5}
+                                    name="name"
+                                    id="name"
+                                    onInput$={(ev: any) => {
+                                      testsFile.tests[exam.id - 1].points = parseFloat(
+                                        ev.target.value,
+                                      );
+                                      recalculatePoints();
+                                    }}
+                                    class="mt-1 block w-24 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ))
+            : null}
           {state.tests.length ? (
             <>
-              <div class="hidden sm:block" aria-hidden="true">
-                <div class="py-5">
-                  <div class="border-t border-gray-200"></div>
-                </div>
-              </div>
-              <div class="mt-10 sm:mt-0">
-                <div class="md:grid md:grid-cols-3 md:gap-6">
-                  <div class="md:col-span-1">
-                    <div class="px-4 sm:px-0">
-                      <h3 class="text-lg font-medium leading-6 text-gray-900">Testy</h3>
-                      <p class="mt-1 text-sm text-gray-600">
-                        Definujte body za jednotlivé testové funkcie.
-                      </p>
+              <div class="bg-gray-50 flex flex-col justify-center px-4 py-3 sm:px-6 space-x-6 text-right">
+                <div class="self-center">celkový počet bodov: {state.points}</div>
+                <div class="flex flex-col justify-center my-6">
+                  <label class="text-base text-center font-semibold text-gray-900">Choose your main file</label>
+                  <fieldset class="my-4 self-center">
+                    <div class="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                      {state.tests.map(
+                        (testsFile: { testsFile: any; tests: any }, index: number) => (
+                          <div key={index} class="flex items-center">
+                            <input
+                              id={testsFile.testsFile.originalname}
+                              name="tests"
+                              type="radio"
+                              value={testsFile.testsFile.originalname}
+                              onChange$={(evt) => {
+                                state.mainFile = evt.target.value
+                              }}
+                              class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                            />
+                            <label
+                              for={testsFile.testsFile.originalname}
+                              class="ml-3 block text-sm font-medium leading-6 text-gray-900"
+                            >
+                              {testsFile.testsFile.originalname}
+                            </label>
+                          </div>
+                        ),
+                      )}
                     </div>
-                  </div>
-                  <div class="mt-5 md:col-span-2 md:mt-0">
-                    <div class="overflow-hidden shadow sm:rounded-md">
-                      <div class="bg-white px-4 py-5 sm:p-6">
-                        {state.tests?.map((exam: any) => {
-                          return (
-                            <div key={exam._id} class="flex align-middle justify-between space-x-4">
-                              <label
-                                for="name"
-                                class="block text-sm w-72 font-medium text-gray-700 self-center text-md tracking-wider"
-                              >
-                                <span class="text-lg font-bold">{exam.id}</span> {exam.name}
-                              </label>
-                              <input
-                                type="number"
-                                step={0.5}
-                                name="name"
-                                id="name"
-                                onInput$={(ev: any) => {
-                                  state.tests[exam.id - 1].points = parseFloat(ev.target.value);
-                                  recalculatePoints();
-                                }}
-                                class="mt-1 block w-24 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div class="bg-gray-50 px-4 py-3 text-right sm:px-6 flex space-x-6 justify-end">
-                        <div class="self-center">celkový počet bodov: {state.points}</div>
-                        <button
-                          type="submit"
-                          disabled={loading.value}
-                          onClick$={async () => {
-                            //const { value } = await handleCreate.run(state);
-                            const res = await ExamApi.createExam(state);
-                            if (res.message === 'success')
-                              window.location = `${appUrl}professor` as any;
-                          }}
-                          class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                          Uložiť test
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  </fieldset>
                 </div>
+                <button
+                  type="submit"
+                  disabled={loading.value}
+                  onClick$={async () => {
+                    //const { value } = await handleCreate.run(state);
+                    const res = await ExamApi.createExam(state);
+                    if (res.message === 'success') window.location = `${appUrl}professor` as any;
+                  }}
+                  class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Uložiť test
+                </button>
               </div>
             </>
           ) : null}
