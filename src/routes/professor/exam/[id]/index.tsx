@@ -218,7 +218,7 @@ export default component$(() => {
                     <div>email: {state.test.user && state.test.user.email}</div>
                   </div>
                   <div class={profileTabs.active !== 'evaluation' ? 'hidden' : ''}>
-                    <Evaluation test={state.test} exam={dataResource.value.exam} />
+                    <Evaluation user={state.test.user} test={state.test} exam={dataResource.value.exam} />
                   </div>
                   <div class={`p-2 ${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
                     {state.test.reports && state.test.reports.map((report: any, index: number) => (

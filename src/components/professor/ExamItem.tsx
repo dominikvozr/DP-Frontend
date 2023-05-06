@@ -1,4 +1,4 @@
-import { component$, useStore } from '@builder.io/qwik';
+import { component$, useSignal, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import { qwikify$ } from '@builder.io/qwik-react';
 import ChevronRightIcon from '@heroicons/react/20/solid/ChevronRightIcon';
 import { appUrl } from '~/db/url';
@@ -12,6 +12,19 @@ export const ExamItem = component$<ExamItemProps>((props) => {
   const state = useStore({
     startDate: new Date(props.exam.startDate),
     endDate: new Date(props.exam.endDate),
+  });
+  const copyableRef = useSignal<HTMLElement>();
+  useVisibleTask$(({ cleanup }) => {
+    if (copyableRef.value) {
+      // Use the DOM API to add an event listener.
+      const copy = () =>
+        window.navigator.clipboard.writeText(copyableRef.value?.dataset.link || '');
+
+      copyableRef.value!.addEventListener('click', copy);
+      cleanup(() => {
+        copyableRef.value!.removeEventListener('click', copy);
+      });
+    }
   });
   return (
     <div class="flex items-center justify-between space-x-4">
@@ -63,11 +76,13 @@ export const ExamItem = component$<ExamItemProps>((props) => {
       <div class="hidden flex-shrink-0 flex-col items-end space-y-3 sm:flex">
         <div class="flex items-center space-x-4">
           <button
-            onClick$={() => {
-              window.navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug);
-            }}
+            ref={copyableRef}
+            data-link={appUrl + 'student/test/' + props.exam.slug}
             class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
           >
+            {/* onClick$={() => {
+              window.navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug);
+            }} */}
             Copy join link
           </button>
           {/* <button
