@@ -28,7 +28,7 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
 
 export default component$(() => {
 	const state = useStore({
-		examTests: [] as any,
+		examTests: [] as { fileName: object, tests: object[] }[],
 		message: '',
 		loading: false,
 		alert: false,
@@ -64,56 +64,69 @@ export default component$(() => {
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
 							<p class="text-sm font-medium leading-6 text-blue-400">Number of test cases</p>
 							<p class="mt-2 flex items-baseline gap-x-2 justify-center">
-								<span class="text-4xl font-semibold tracking-tight text-white">{state.examTests.length}</span>
+								<span class="text-4xl font-semibold tracking-tight text-white">{_.sum(state.examTests.map((ts) => ts.tests.length))}</span>
 							</p>
 						</div>
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
 							<p class="text-sm font-medium leading-6 text-blue-400">Total available points</p>
 							<p class="mt-2 flex items-baseline gap-x-2 justify-center">
-								<span class="text-4xl font-semibold tracking-tight text-white">{state.examTests.reduce((acc: number, curr:any) => acc + curr.points, 0)}</span>
+								<span class="text-4xl font-semibold tracking-tight text-white">{dataResource.value.exam.points}</span>
 							</p>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="grid grid-cols-4 gap-4 px-4 py-4 w-3/4 mx-auto">
-				{dataResource.value.test.score && dataResource.value.test.score.tests.map((test: any, index: any) => {
-					if(test.passed) {
-						return (
-							<div key={index}>
-								<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
-									<strong>{index + 1}.</strong> {state.examTests[index].name}
-								</label>
-								<div class="relative mt-2 rounded-md shadow-sm">
-								<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-green-900 ring-1 ring-inset ring-green-300 placeholder:text-green-300 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6" value={test.value} aria-invalid="true" aria-describedby="email-error" />
-									<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-										<svg class="h-5 w-5 text-green-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-											<path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
-										</svg>
-									</div>
-								</div>
-							</div>
-						)
-					} else {
-							return (
-								<div key={index}>
-									<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
-										<strong>{index + 1}.</strong> {state.examTests[index].name}
-									</label>
-									<div class="relative mt-2 rounded-md shadow-sm">
-										<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-sm sm:leading-6" value={test.value} aria-invalid="true" aria-describedby="email-error" />
-										<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-											<svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-											</svg>
+			{ dataResource.value.test.score?.tests.map((testFile: {file: string, tests: {name: string, classname: string, failure: string, value: number}[]}, idx: number) => <>
+				<div class="m-2 bg-gray-50">
+					<div class="px-6 pt-6 pb-2 lg:px-8">
+						<div class="mx-auto max-w-2xl text-center">
+							<h2 class="text-lg font-bold tracking-tight text-gray-900">{testFile.file}</h2>
+							{/* <p class="mt-6 text-lg leading-8 text-gray-600">{dataResource.value.exam.description}</p> */}
+						</div>
+					</div>
+					<div key={idx} class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
+						{testFile.tests.map((test: { name: string, classname: string, failure: string, value: number }, index: any) => {
+							if(!test.failure) {
+								return (
+									<div key={index}>
+										<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
+											<strong>{index + 1}.</strong> {test.name}
+										</label>
+										<div class="relative mt-2 rounded-md shadow-sm">
+										<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-green-900 ring-1 ring-inset ring-green-300 placeholder:text-green-300 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6"
+											value={test.value} aria-invalid="true" aria-describedby="email-error" />
+											<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+												<svg class="h-5 w-5 text-green-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+													<path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+												</svg>
+											</div>
 										</div>
 									</div>
-								</div>
-							)
-						}
-					}
-				)}
-			</div>
+								)
+							} else {
+								return (
+									<div key={index}>
+											<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
+												<strong>{index + 1}.</strong> {test.name}
+											</label>
+											<span></span>
+											<div class="relative mt-2 rounded-md shadow-sm">
+												<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-sm sm:leading-6"
+												value={test.value} aria-invalid="true" aria-describedby="email-error" />
+												<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+													<svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+														<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+													</svg>
+												</div>
+											</div>
+										</div>
+									)
+								}
+							}
+							)}
+					</div>
+				</div>
+			</>)}
 			<div class={`${dataResource.value.test.reports.length ? '' : 'hidden'}`}>
 				<div class="bg-white px-6 py-3 lg:px-8">
 					<div class="mx-auto max-w-2xl text-center">

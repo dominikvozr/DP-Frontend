@@ -1,4 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { component$, useStore, $, useTask$ } from '@builder.io/qwik';
+import _ from 'lodash';
 import { TestApi } from '~/db/TestApi';
 
 export interface EvaluationProps {
@@ -6,27 +8,39 @@ export interface EvaluationProps {
   exam: any;
 }
 
+interface ScoreTests {
+  file: string,
+  tests: {
+    name: string,
+    classname: string,
+    failure: string,
+    value: number
+  }[]
+}
+
 export const Evaluation = component$<EvaluationProps>((props) => {
   const state = useStore({
     examTests: [] as any,
+    displayTests: [] as ScoreTests[],
     message: '',
     loading: false,
     alert: false,
-    points: props.test.score ? props.test.score.points : 0,
-    percentage: props.test.score ? (props.test.score.points / props.exam.points) * 100 : 0,
+    points: props.test.score?.points || 0,
+    percentage: ((props.test.score?.points / props.exam.points) * 100) || 0,
   });
 
   const recalculateScore = $(() => {
-    state.points = props.test.score.tests.reduce(
-      (acc: number, curr: any) => acc + parseInt(curr.value),
+    state.points = _.sum(props.test.score.tests.map((tts: ScoreTests) => tts.tests.reduce(
+      (acc: number, curr) => acc + (curr.value || 0),
       0,
-    );
+    ))) || 0
     props.test.score.points = state.points;
     state.percentage = (state.points / props.exam.points) * 100;
     props.test.score.percentage = state.percentage.toFixed(2);
   });
 
   useTask$(() => {
+    state.displayTests = props.test.score.tests
     state.examTests = props.exam.tests;
   });
 
@@ -61,7 +75,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
               <p class="text-sm font-medium leading-6 text-indigo-400">Number of test cases</p>
               <p class="mt-2 flex items-baseline gap-x-2 justify-center">
                 <span class="text-4xl font-semibold tracking-tight text-white">
-                  {state.examTests.length}
+                  {_.sum(state.displayTests.map((ts) => ts.tests.length))}
                 </span>
               </p>
             </div>
@@ -69,25 +83,34 @@ export const Evaluation = component$<EvaluationProps>((props) => {
               <p class="text-sm font-medium leading-6 text-indigo-400">Total available points</p>
               <p class="mt-2 flex items-baseline gap-x-2 justify-center">
                 <span class="text-4xl font-semibold tracking-tight text-white">
-                  {state.examTests.reduce((acc: number, curr: any) => acc + curr.points, 0)}
+                  {props.exam.points}
                 </span>
               </p>
             </div>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-4 gap-4 px-4 py-4 w-3/4 mx-auto">
-        {props.test.score &&
-          props.test.score.tests.map((test: any, index: any) => (
+
+      {state.displayTests?.map((testFile, idx: number) =>
+      <>
+        <div class="m-2 bg-gray-50">
+          <div class="px-6 pt-6 pb-2 lg:px-8">
+            <div class="mx-auto max-w-2xl text-center">
+              <h2 class="text-lg font-bold tracking-tight text-gray-900">{testFile.file}</h2>
+              {/* <p class="mt-6 text-lg leading-8 text-gray-600">{dataResource.value.exam.description}</p> */}
+            </div>
+          </div>
+          <div key={idx} class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
+            {testFile.tests.map((test: { name: string, classname: string, failure: string, value: number }, index: any) => (
             <div key={index}>
               <label for={index} class="block relative text-sm font-medium leading-6">
-                <strong>{index + 1}.</strong> {state.examTests[index].name}
+                <strong>{index + 1}.</strong> {test.name}
               </label>
               <div class="relative mt-2 rounded-md shadow-sm">
                 <input
                   onInput$={(evt: any) => {
-                    props.test.score.tests[index].value = parseInt(evt.target.value);
-                    props.test.score.tests[index].passed = props.test.score.tests[index].value > 0;
+                    props.test.score.tests[idx].tests[index].value = parseInt(evt.target.value);
+                    props.test.score.tests[idx].tests[index].passed = props.test.score.tests[idx].tests[index].value > 0;
                     recalculateScore();
                   }}
                   type="number"
@@ -100,14 +123,15 @@ export const Evaluation = component$<EvaluationProps>((props) => {
                 />
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <span class="absolute px-2 text-sm bg-indigo-300 rounded-full text-white right-2">
-                    {state.examTests[index].points}
+                    {props.exam.tests[idx].tests[index].points}
                   </span>
                 </div>
               </div>
             </div>
           ))}
+        </div>
       </div>
-
+      </>)}
       <div class="flex justify-center mb-4">
         <button
           class={`${

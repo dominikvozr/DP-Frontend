@@ -64,7 +64,7 @@ export const ExamItem = component$<ExamItemProps>((props) => {
         <div class="flex items-center space-x-4">
           <button
             onClick$={() => {
-              navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug);
+              window.navigator.clipboard.writeText(appUrl + 'student/test/' + props.exam.slug);
             }}
             class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
           >

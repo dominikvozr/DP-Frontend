@@ -10,7 +10,7 @@ export const ExamModal = component$(() => {
       <div class={examModalData.open ? 'opacity-100 fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity': 'opacity-0 fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity'}></div>
       <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-          <div class={examModalData.open ? 'relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 opacity-100 translate-y-0 sm:scale-100': 'relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
+          <div class={examModalData.open ? 'relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:p-6 opacity-100 translate-y-0 sm:scale-100': 'relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:p-6 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}>
             <div>
               <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                 <svg
@@ -44,13 +44,37 @@ export const ExamModal = component$(() => {
                   <div class="text-sm text-gray-500 py-2 border-t-2">
                     Total points: {examModalData.exam.points}
                   </div>
-                  <div class="flex justify-center space-x-2 text-sm text-gray-500 py-2 border-t-2">
+                  <div class=" text-md text-gray-500 my-2">
                     <div class="self-center">Tests:</div>
-                    <div>
-                      {examModalData.exam.tests.map((test: any) => {
-                        return(<div key={test.id} class="text-left">name: {test.name} value: {test.points}</div>)
-                      })}
-                    </div>
+                    {examModalData.exam.tests.map((test: { testsFile: { classname: string, originalname: string }, tests: { id: number, name: string, points: number }[] }, index: number) => <>
+                      <div key={index} class="mt-4">
+                        <h2 class="text-sm font-medium bg-gray-50 text-gray-500 border-2 p-2">{test.testsFile.originalname}</h2>
+                        <ul role="list" class="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+                          {test.tests.map((test) => <>
+                            <li key={test.id} class="col-span-1 flex rounded-md shadow-sm">
+                              <div class="flex flex-1 items-center justify-between truncate rounded-l-md border-b border-l border-t border-gray-200 bg-white">
+                                <div class="flex-1 truncate px-4 py-2 text-sm">
+                                  <p class="font-medium text-gray-900 hover:text-gray-600">
+                                    {test.name}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="flex w-16 flex-shrink-0 items-center justify-center text-sm rounded-r-md font-medium text-white bg-indigo-600">
+                                {test.points}
+                              </div>
+                            </li>
+                          </>)}
+                        </ul>
+                      </div>
+
+
+                      {/* <div key={index}>file: {test.testsFile.originalname}</div>
+                      <div class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
+                        {test.tests.map((test) => <>
+                          <div class="" key={test.id}>{test.name} value: {test.points}</div>
+                        </>)}
+                      </div> */}
+                    </>)}
                   </div>
                 </div>
               </div>
