@@ -110,7 +110,7 @@ export default component$(() => {
 					class={`${!state.loading ? 'block' : 'hidden'} inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 mt-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-36`}
 					onClick$={async () => {
 						state.loading = true
-						const result: any = await TestApi.updateTestResults(dataResource.value.test);
+						const result: any = await TestApi.updateTestResults(dataResource.value.test._id, dataResource.value.test.score);
 						state.loading = false
 						if (result.status === 200) {
 							state.alert = true
