@@ -126,7 +126,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
           <div class="px-6 pt-6 pb-2 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
               <h2 class="text-lg font-bold tracking-tight text-gray-900">{testFile.file}</h2>
-              {/* <p class="mt-6 text-lg leading-8 text-gray-600">{dataResource.value.exam.description}</p> */}
+              {/*   <p class="mt-6 text-lg leading-8 text-gray-600">{dataResource.value.exam.description}</p> */}
             </div>
           </div>
           <div key={idx} class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
