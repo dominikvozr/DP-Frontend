@@ -138,9 +138,10 @@ export const Evaluation = component$<EvaluationProps>((props) => {
               <div class="relative mt-2 rounded-md shadow-sm">
                 <input
                   onInput$={(evt: any) => {
+                    state.scoreData[idx] = {}
                     state.scoreData[idx][index] = parseInt(evt.target.value);
-                    /* props.test.score.tests[idx].tests[index].value = parseInt(evt.target.value);
-                    props.test.score.tests[idx].tests[index].passed = props.test.score.tests[idx].tests[index].value > 0; */
+                    props.test.score.tests[idx].tests[index].value = parseInt(evt.target.value);
+                    props.test.score.tests[idx].tests[index].passed = props.test.score.tests[idx].tests[index].value > 0;
                     recalculateScore();
                   }}
                   type="number"
