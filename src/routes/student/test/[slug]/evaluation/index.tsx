@@ -86,7 +86,7 @@ export default component$(() => {
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
 							<p class="text-sm font-medium leading-6 text-blue-400">Success rate</p>
 							<p class="mt-2 flex items-baseline gap-x-2 justify-center">
-								<span class="text-4xl font-semibold tracking-tight text-white">{dataResource.value.test.score.percentage}%</span>
+								<span class="text-4xl font-semibold tracking-tight text-white">{dataResource.value.test.score.percentage.toFixed(2)}%</span>
 							</p>
 						</div>
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
@@ -104,7 +104,7 @@ export default component$(() => {
 					</div>
 				</div>
 			</div>
-			{ dataResource.value.test.score?.tests.map((testFile: {file: string, tests: {name: string, classname: string, failure: string, value: number}[]}, idx: number) => <>
+			{ dataResource.value.test.score?.tests.map((testFile: {file: string, tests: {name: string, classname: string, failure: string, value: number, passed: boolean}[]}, idx: number) => <>
 				<div class="m-2 bg-gray-50">
 					<div class="px-6 pt-6 pb-2 lg:px-8">
 						<div class="mx-auto max-w-2xl text-center">
@@ -113,8 +113,8 @@ export default component$(() => {
 						</div>
 					</div>
 					<div key={idx} class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
-						{testFile.tests.map((test: { name: string, classname: string, failure: string, value: number }, index: any) => {
-							if(!test.failure) {
+						{testFile.tests.map((test, index: number) => {
+							if(test.passed) {
 								return (
 									<div key={index}>
 										<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
