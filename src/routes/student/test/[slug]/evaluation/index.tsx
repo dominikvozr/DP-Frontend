@@ -64,7 +64,7 @@ export default component$(() => {
 					</button>
 				</div>
 				{state.showGit && <>
-					<div class="animate-[show-up-clock_350ms_linear] bg-blue-600 border-2 border-blue-900 mt-4 py-1.5 text-gray-100 text-xs text-center">{`git clone http://${dataResource.value.user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${dataResource.value.user.gitea.username}/${dataResource.value.test.slug}.git`}</div>
+					<div class="animate-[show-up-clock_350ms_linear] bg-blue-600 border-2 border-blue-900 mt-4 py-1.5 text-gray-100 text-xs text-center">{`git clone http://${dataResource.value.user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${dataResource.value.user.gitea.username}/${dataResource.value.test.slug}-student.git`}</div>
 				</>}
 			</div>
 			<div class="bg-blue-900">

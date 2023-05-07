@@ -73,7 +73,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
           </button>
         </div>
         { state.showGit && <>
-          <div class="animate-[show-up-clock_350ms_linear] bg-indigo-600 border-2 border-indigo-900 mt-4 py-1.5 text-gray-100 text-xs text-center">{`git clone http://${props.user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${props.user.gitea.username}/${props.test.slug}.git`}</div>
+          <div class="animate-[show-up-clock_350ms_linear] bg-indigo-600 border-2 border-indigo-900 mt-4 py-1.5 text-gray-100 text-xs text-center">{`git clone http://${props.user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${props.user.gitea.username}/${props.test.slug}-student.git`}</div>
         </>}
       </div>
       <div class="bg-indigo-900">
