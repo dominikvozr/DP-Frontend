@@ -42,7 +42,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
     props.test.score.percentage = state.percentage.toFixed(2);
   });
   useTask$(() => {
-    state.displayTests = props.test.score.tests
+    state.displayTests = props.test.score?.tests
     state.examTests = props.exam.tests;
   });
 
@@ -97,7 +97,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
               <p class="text-sm font-medium leading-6 text-indigo-400">Number of test cases</p>
               <p class="mt-2 flex items-baseline gap-x-2 justify-center">
                 <span class="text-4xl font-semibold tracking-tight text-white">
-                  {_.sum(state.displayTests.map((ts) => ts.tests.length))}
+                  {_.sum(state.displayTests?.map((ts) => ts.tests.length))}
                 </span>
               </p>
             </div>

@@ -79,7 +79,7 @@ export default component$(() => {
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">
 							<p class="text-sm font-medium leading-6 text-blue-400">Success rate</p>
 							<p class="mt-2 flex items-baseline gap-x-2 justify-center">
-								<span class="text-4xl font-semibold tracking-tight text-white">{dataResource.value.test.score.percentage.toFixed(2)}%</span>
+								<span class="text-4xl font-semibold tracking-tight text-white">{dataResource.value.test.score.percentage?.toFixed(2)}%</span>
 							</p>
 						</div>
 						<div class="bg-blue-900 px-4 py-6 sm:px-6 lg:px-8">

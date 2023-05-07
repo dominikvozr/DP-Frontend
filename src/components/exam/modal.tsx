@@ -46,9 +46,9 @@ export const ExamModal = component$(() => {
                   </div>
                   <div class=" text-md text-gray-500 my-2">
                     <div class="self-center">Tests:</div>
-                    {examModalData.exam.tests.map((test: { testsFile: { classname: string, originalname: string }, tests: { id: number, name: string, points: number }[] }, index: number) => <>
+                    {examModalData.exam.tests?.map((test: { testsFile: { classname: string, originalname: string | undefined }, tests: { id: number, name: string, points: number }[] }, index: number) => <>
                       <div key={index} class="mt-4">
-                        <h2 class="text-sm font-medium bg-gray-50 text-gray-500 border-2 p-2">{test.testsFile.originalname}</h2>
+                        <h2 class="text-sm font-medium bg-gray-50 text-gray-500 border-2 p-2">{test.testsFile?.originalname}</h2>
                         <ul role="list" class="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                           {test.tests.map((test) => <>
                             <li key={test.id} class="col-span-1 flex rounded-md shadow-sm">
