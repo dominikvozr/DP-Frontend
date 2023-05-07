@@ -17,12 +17,12 @@ export class TestApi {
     }
   };
 
-  static updateTestResults = async (test: any) => {
+  static updateTestResults = async (testId: any, scoreData: any) => {
     try {
-      const res = await fetch(`${baseUrl}api/v1/student/test/update/score/${test._id}`, {
+      const res = await fetch(`${baseUrl}api/v1/student/test/update/score/${testId}`, {
         method: 'PUT',
         credentials: 'include',
-        body: JSON.stringify(test.score),
+        body: JSON.stringify(scoreData),
         headers: {
           'content-type': 'application/json',
         },

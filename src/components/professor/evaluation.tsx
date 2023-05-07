@@ -23,6 +23,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
   const state = useStore({
     examTests: [] as any,
     displayTests: [] as ScoreTests[],
+    scoreData: [] as any,
     message: '',
     loading: false,
     alert: false,
@@ -137,8 +138,9 @@ export const Evaluation = component$<EvaluationProps>((props) => {
               <div class="relative mt-2 rounded-md shadow-sm">
                 <input
                   onInput$={(evt: any) => {
-                    props.test.score.tests[idx].tests[index].value = parseInt(evt.target.value);
-                    props.test.score.tests[idx].tests[index].passed = props.test.score.tests[idx].tests[index].value > 0;
+                    state.scoreData[idx][index] = parseInt(evt.target.value);
+                    /* props.test.score.tests[idx].tests[index].value = parseInt(evt.target.value);
+                    props.test.score.tests[idx].tests[index].passed = props.test.score.tests[idx].tests[index].value > 0; */
                     recalculateScore();
                   }}
                   type="number"
@@ -167,7 +169,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
           } inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 mt-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-36`}
           onClick$={async () => {
             state.loading = true;
-            const result: any = await TestApi.updateTestResults(props.test);
+            const result: any = await TestApi.updateTestResults(props.test._id, state.scoreData);
             state.loading = false;
             if (result.status === 200) {
               state.alert = true;
