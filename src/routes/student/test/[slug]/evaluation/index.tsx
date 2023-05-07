@@ -110,11 +110,11 @@ export default component$(() => {
 							if(test.passed) {
 								return (
 									<div key={index}>
-										<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
+										<label for={index.toString()} class="block text-sm font-medium leading-6 text-gray-900">
 											<strong>{index + 1}.</strong> {test.name}
 										</label>
 										<div class="relative mt-2 rounded-md shadow-sm">
-										<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-green-900 ring-1 ring-inset ring-green-300 placeholder:text-green-300 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6"
+										<input type="number" disabled name={index.toString()} id={index.toString()} class="block w-full rounded-md border-0 py-1.5 pr-10 text-green-900 ring-1 ring-inset ring-green-300 placeholder:text-green-300 focus:ring-2 focus:ring-inset focus:ring-green-500 sm:text-sm sm:leading-6"
 											value={test.value} aria-invalid="true" aria-describedby="email-error" />
 											<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
 												<svg class="h-5 w-5 text-green-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -127,12 +127,12 @@ export default component$(() => {
 							} else {
 								return (
 									<div key={index}>
-											<label for={index} class="block text-sm font-medium leading-6 text-gray-900">
+											<label for={index.toString()} class="block text-sm font-medium leading-6 text-gray-900">
 												<strong>{index + 1}.</strong> {test.name}
 											</label>
 											<span></span>
 											<div class="relative mt-2 rounded-md shadow-sm">
-												<input type="number" disabled name={index} id={index} class="block w-full rounded-md border-0 py-1.5 pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-sm sm:leading-6"
+												<input type="number" disabled name={index.toString()} id={index.toString()} class="block w-full rounded-md border-0 py-1.5 pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500 sm:text-sm sm:leading-6"
 												value={test.value} aria-invalid="true" aria-describedby="email-error" />
 												<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
 													<svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -144,7 +144,7 @@ export default component$(() => {
 									)
 								}
 							}
-							)}
+						)}
 					</div>
 				</div>
 			</>)}
