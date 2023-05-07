@@ -22,7 +22,7 @@ export class TestApi {
       const res = await fetch(`${baseUrl}api/v1/student/test/update/score/${test._id}`, {
         method: 'PUT',
         credentials: 'include',
-        body: JSON.stringify(test),
+        body: JSON.stringify(test.score),
         headers: {
           'content-type': 'application/json',
         },
