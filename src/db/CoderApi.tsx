@@ -49,7 +49,7 @@ export class CoderApi {
         try {
             const endDate = new Date(data.endDate);
             let startDate = new Date(data.startDate)
-            const repo = `${user.gitea.username}/${data.slug}-exam`;
+            const repo = `${user.gitea.username}/${data.slug}-student`;
             const git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
 
             if(startDate.getTime()<= new Date().getTime()){

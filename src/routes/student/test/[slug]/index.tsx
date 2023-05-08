@@ -33,13 +33,19 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 //RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
+  if(data?.exam.isOpen){
+    const test = await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id)
 
-  return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
+    return { test: test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
+  }else{
+    return undefined;
+  }
+
 });
 
 export const createAndOrLogin = routeLoader$(async ( requestEvent ) => {
   const data = await requestEvent.resolveValue(useTestData);
-  if(data.exam?.isOpen){
+  if(data?.exam?.isOpen){
     const loginUser = await CoderApi.login(requestEvent.request.headers.get('cookie'));
 
     if (loginUser?.id) {
@@ -51,6 +57,7 @@ export const createAndOrLogin = routeLoader$(async ( requestEvent ) => {
       }
     }
   }
+  return undefined;
 });
 
 export const createWorkspace = routeLoader$(async (requestEvent) => {
@@ -64,21 +71,15 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           data.exam.slug,
         cookie,
       );
-      const accessData = await CoderApi.getSession(
-        user.userObject.username,
-          data.exam.slug,
-        cookie,
-      );
-
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
 
-        const workspace = await CoderApi.createWorkspace(data.user,data.exam, cookie);
+        const workspace = await CoderApi.createWorkspace(data.user,data.test, cookie);
         console.log(workspace)
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
-          user.userObject.username,
-            data.exam.slug,
-          cookie,
+            user.userObject.username,
+            data.test.slug,
+            cookie,
         );
         return {
           workspace: workspace,
@@ -87,6 +88,12 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           cookie: cookie,
         };
       } else {
+
+        const accessData = await CoderApi.getSession(
+            user.userObject.username,
+            data.test.slug,
+            cookie,
+        );
         return {
           workspace: workspaceStatus,
           accessData: JSON.parse(accessData),
@@ -174,6 +181,7 @@ const TestShow = component$(() => {
                   if (agent.apps[j].health !== 'healthy') {
                     statusSignal.value = 'Posledné prípravy!';
                     appsReady = false;
+                    return;
                   }
                 }
               });
@@ -208,9 +216,7 @@ const TestShow = component$(() => {
 
   const examData = useContext(ExamDataContext);
   return (
-
       <>
-
         <div class="relative bg-gray-900">
           <div class="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
             <img class="h-full w-full object-cover" src="/image/thinkin-monke.jpg" alt="sad-face" />
