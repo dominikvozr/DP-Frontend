@@ -1,6 +1,21 @@
 import { baseUrl } from '~/db/url';
 
 export class ExamApi {
+  static createRepo = async (cookies: any,data: any) =>{
+    try{
+      const res = await fetch(baseUrl+'api/v1/student/test/create', {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json',
+        }
+      });
+      return await res.json();
+    }catch (e){
+      console.error(e);
+    }
+  }
   static createExam = async (data: any) => {
     try {
       const res = await fetch(baseUrl + 'api/v1/professor/exam/create', {
