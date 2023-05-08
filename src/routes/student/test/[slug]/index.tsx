@@ -34,7 +34,13 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 //RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-  if (data?.exam.isOpen) await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id);
+  const startDate = new Date(data.exam.startDate);
+  const endDate = new Date(data.exam.endDate);
+  const currentDate = new Date();
+  if (startDate <= currentDate && currentDate <= endDate) data.exam.isOpen = true;
+  else data.exam.isOpen = false;
+  if (_.isEmpty(data?.test) && data.exam.isOpen)
+    data.test = await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id);
   return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
 });
 
