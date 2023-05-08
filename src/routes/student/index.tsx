@@ -16,7 +16,6 @@ import { ActivityBar } from '~/components/activityBar/activityBar';
 export const useTestsData = routeLoader$(async ({ request, query }) => {
   const page = query.get('page') ?? '0';
   const data = await TestApi.getTests(request.headers.get('cookie'), page);
-  // console.log(data);
   return { tests: data?.tests, user: data?.user, isAuthorized: data?.isAuthorized, testsCount: data?.testsCount, page: parseInt(page), };
 });
 
@@ -56,7 +55,7 @@ export default component$(() => {
           {/* Left sidebar & main wrapper */}
           <div class="min-w-0 flex-1 bg-white xl:flex">
             {/* Account profile */}
-            <div class="bg-white xl:w-64 xl:flex-shrink-0 xl:border-r xl:border-gray-200">
+            <div class="bg-white xl:w-64 xl:flex-shrink-0">
               <div class="py-6 pl-4 pr-6 sm:pl-6 lg:pl-8 xl:pl-0">
                 <div class="flex items-center justify-between">
                   <div class="flex-1 space-y-8">
@@ -137,7 +136,7 @@ export default component$(() => {
                   <h1 class="flex-1 text-lg font-medium">Tests</h1>
                 </div>
               </div>
-              <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
+              <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200 xl:border-x xl:border-gray-200">
                 {dataResource.value.tests && dataResource.value.tests.map((test: any) => (
                   <li
                     key={test._id}

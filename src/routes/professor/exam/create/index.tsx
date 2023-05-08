@@ -611,35 +611,6 @@ export default component$(() => {
             <>
               <div class="bg-gray-50 flex flex-col justify-center px-4 py-3 sm:px-6 space-x-6 text-right">
                 <div class="self-center">celkový počet bodov: {state.points}</div>
-                <div class="flex flex-col justify-center my-6">
-                  <label class="text-base text-center font-semibold text-gray-900">Choose your main file</label>
-                  <fieldset class="my-4 self-center">
-                    <div class="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                      {state.tests.map(
-                        (testsFile: { testsFile: any; tests: any }, index: number) => (
-                          <div key={index} class="flex items-center">
-                            <input
-                              id={testsFile.testsFile.originalname}
-                              name="tests"
-                              type="radio"
-                              value={testsFile.testsFile.originalname}
-                              onChange$={(evt) => {
-                                state.mainFile = evt.target.value
-                              }}
-                              class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                            />
-                            <label
-                              for={testsFile.testsFile.originalname}
-                              class="ml-3 block text-sm font-medium leading-6 text-gray-900"
-                            >
-                              {testsFile.testsFile.originalname}
-                            </label>
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </fieldset>
-                </div>
                 <button
                   type="submit"
                   disabled={loading.value}

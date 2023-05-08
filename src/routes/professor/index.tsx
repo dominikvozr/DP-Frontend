@@ -57,7 +57,7 @@ export default component$(() => {
           {/* Left sidebar & main wrapper */}
           <div class="min-w-0 flex-1 bg-white xl:flex">
             {/* Account profile */}
-            <div class="bg-white xl:w-64 xl:flex-shrink-0 xl:border-r xl:border-gray-200">
+            <div class="bg-white xl:w-64 xl:flex-shrink-0">
               <div class="py-6 pl-4 pr-6 sm:pl-6 lg:pl-8 xl:pl-0">
                 <div class="flex items-center justify-between">
                   <div class="flex-1 space-y-8">
@@ -102,12 +102,6 @@ export default component$(() => {
                         >
                           New pipeline
                         </a>
-                        <a
-                          href={`${appUrl}professor/template/create`}
-                          class="mt-3 inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 xl:ml-0 xl:mt-3 xl:w-full"
-                        >
-                          New template
-                        </a>
                       </div>
                     </div>
                     {/* Meta info */}
@@ -131,7 +125,7 @@ export default component$(() => {
                   <h1 class="flex-1 text-lg font-medium">Exams</h1>
                 </div>
               </div>
-              <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
+              <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200 xl:border-x xl:border-gray-200">
                 {dataResource.value.exams?.map((exam: Exam) => (
                   <li
                     key={exam._id}

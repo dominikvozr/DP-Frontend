@@ -259,8 +259,6 @@ export default component$(() => {
                         if (!keys.length) return
                         await ReportApi.reply(state.replies, state.test._id);
                         state.reports = state.reports.filter((report: any) => !keys.includes(report._id))
-                        console.log(state.reports);
-
                       }}
                     >
                       save
