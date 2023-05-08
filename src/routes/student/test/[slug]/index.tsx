@@ -18,6 +18,7 @@ import { TestInvitation } from '~/components/test/testInvitation';
 import { TestClosed } from '~/components/test/testClosed';
 import _ from 'lodash';
 import { ExamApi } from '~/db/ExamApi';
+import { Evaluation } from '~/components/student/evaluation';
 
 //Check authorisation
 export const onGet: RequestHandler = async ({ request, redirect, url }) => {
@@ -33,23 +34,13 @@ export const onGet: RequestHandler = async ({ request, redirect, url }) => {
 //RouteLoaders
 export const useTestData = routeLoader$(async ({ request, params }) => {
   const data: any = await TestApi.getTestByExamSlug(params.slug, request.headers.get('cookie'));
-  if(data?.exam.isOpen){
-    const test = await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id)
-
-    return { test: test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
-  }else{
-    return undefined;
-  }
-
+  if (data?.exam.isOpen) await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id);
+  return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
 });
 
 export const createAndOrLogin = routeLoader$(async (requestEvent) => {
   const data = await requestEvent.resolveValue(useTestData);
-<<<<<<< HEAD
-  if (data.exam?.isOpen) {
-=======
-  if(data?.exam?.isOpen){
->>>>>>> fbdfb91fe6577ba478de56dbc9c5e8975a0f6d69
+  if (data?.exam?.isOpen) {
     const loginUser = await CoderApi.login(requestEvent.request.headers.get('cookie'));
 
     if (loginUser?.id) {
@@ -75,32 +66,14 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
         data.exam.slug,
         cookie,
       );
-<<<<<<< HEAD
-      const accessData = await CoderApi.getSession(
-        user.userObject.username,
-        data.exam.slug,
-        cookie,
-      );
-
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        const workspace = await CoderApi.createWorkspace(data.user, data.exam, cookie);
+        const workspace = await CoderApi.createWorkspace(data.user, data.test, cookie);
         console.log(workspace);
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
           user.userObject.username,
-          data.exam.slug,
+          data.test.slug,
           cookie,
-=======
-      if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-
-        const workspace = await CoderApi.createWorkspace(data.user,data.test, cookie);
-        console.log(workspace)
-        const email = await CoderApi.sentEmailWithLoginData(cookie);
-        const accessData = await CoderApi.getSession(
-            user.userObject.username,
-            data.test.slug,
-            cookie,
->>>>>>> fbdfb91fe6577ba478de56dbc9c5e8975a0f6d69
         );
         return {
           workspace: workspace,
@@ -109,11 +82,10 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           cookie: cookie,
         };
       } else {
-
         const accessData = await CoderApi.getSession(
-            user.userObject.username,
-            data.test.slug,
-            cookie,
+          user.userObject.username,
+          data.test.slug,
+          cookie,
         );
         return {
           workspace: workspaceStatus,
@@ -146,16 +118,31 @@ export default component$(() => {
   useContextProvider(ExamDataContext, examState);
   useContextProvider(TestDataContext, testState);
   return (
-    <div class="relative flex min-h-full flex-col bg-indigo-400">
+    <>
       {/* display test if exist */}
-      {!_.isEmpty(testState.test) && <TestInvitation />}
+      {!_.isEmpty(testState.test) && !testState.test?.score.tests.length && (
+        <div class="relative flex min-h-full flex-col bg-indigo-400">
+          <TestInvitation />
+        </div>
+      )}
 
       {/* display test invite if open */}
-      {_.isEmpty(testState.test) && examState.exam.isOpen && <TestShow />}
-
+      {_.isEmpty(testState.test) && examState.exam?.isOpen && (
+        <div class="relative flex min-h-full flex-col bg-indigo-400">
+          <TestShow />
+        </div>
+      )}
+      {/* display a test evaluation */}
+      {testState.test?.score.tests.length && (
+        <Evaluation exam={examState.exam} test={testState.test} user={dataResource.value?.user} />
+      )}
       {/* display a sad image if exam is closed */}
-      {_.isEmpty(testState.test) && !examState.exam.isOpen && <TestClosed />}
-    </div>
+      {_.isEmpty(testState.test) && !examState.exam?.isOpen && (
+        <div class="relative flex min-h-full flex-col bg-indigo-400">
+          <TestClosed />
+        </div>
+      )}
+    </>
   );
 });
 
@@ -235,7 +222,6 @@ const TestShow = component$(() => {
 
   const examData = useContext(ExamDataContext);
   return (
-<<<<<<< HEAD
     <>
       <div class="relative bg-gray-900">
         <div class="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
@@ -270,118 +256,74 @@ const TestShow = component$(() => {
             <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-3xl">
               {examData.exam.name} - {examData.exam.subject}
             </p>
-            <h1 class="text-base font-semibold leading-7 text-indigo-400">
-              <Clock></Clock>
-            </h1>
-            <div>
-              {/*<p class="text-base font-semibold leading-7 text-white">Skontrolujte email: </p>*/}
-              <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl">
-                {workspaceState.email}
-=======
-      <>
-        <div class="relative bg-gray-900">
-          <div class="relative h-80 overflow-hidden bg-indigo-600 md:absolute md:left-0 md:h-full md:w-1/3 lg:w-1/2">
-            <img class="h-full w-full object-cover" src="/image/thinkin-monke.jpg" alt="sad-face" />
-            <svg
-                viewBox="0 0 926 676"
-                aria-hidden="true"
-                class="absolute left-24 -bottom-24 w-[57.875rem] transform-gpu blur-[118px]"
-            >
-              <path
-                  fill="url(#60c3c621-93e0-4a09-a0e6-4c228a0116d8)"
-                  fill-opacity=".4"
-                  d="m254.325 516.708-90.89 158.331L0 436.427l254.325 80.281 163.691-285.15c1.048 131.759 36.144 345.144 168.149 144.613C751.171 125.508 707.17-93.823 826.603 41.15c95.546 107.978 104.766 294.048 97.432 373.585L685.481 297.694l16.974 360.474-448.13-141.46Z"
-              />
-              <defs>
-                <linearGradient
-                    id="60c3c621-93e0-4a09-a0e6-4c228a0116d8"
-                    x1="926.392"
-                    x2="-109.635"
-                    y1=".176"
-                    y2="321.024"
-                    gradientUnits="userSpaceOnUse"
-                >
-                  <stop stop-color="#776FFF" />
-                  <stop offset="1" stop-color="#FF4694" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div class="relative mx-auto max-w-7xl py-24 sm:py-32 lg:py-40 lg:px-8">
-            <div class="pr-6 pl-6 md:ml-auto md:w-2/3 md:pl-16 lg:w-1/2 lg:pl-24 lg:pr-0 xl:pl-32">
-              <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-3xl">
-                {examData.exam.name} - {examData.exam.subject}
->>>>>>> fbdfb91fe6577ba478de56dbc9c5e8975a0f6d69
-              </p>
-              <div class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl">
-                <button
-                  disabled={emailSent.value}
-                  onClick$={async () => {
-                    //const { value } = await handleCreate.run(state);
-                    const res = await CoderApi.sentEmailWithLoginData(workspaceState.cookie);
-                    console.log(res);
+            <div class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-2xl">
+              <button
+                disabled={emailSent.value}
+                onClick$={async () => {
+                  //const { value } = await handleCreate.run(state);
+                  const res = await CoderApi.sentEmailWithLoginData(workspaceState.cookie);
+                  console.log(res);
 
-                    if (res.response?.startsWith('250')) {
-                      emailSent.value = true;
-                    }
-                  }}
-                  class={
-                    emailSent.value
-                      ? 'inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm'
-                      : 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+                  if (res.response?.startsWith('250')) {
+                    emailSent.value = true;
                   }
-                >
-                  {emailSent.value ? 'Údaje poslané' : 'Znova poslať údaje'}
-                </button>
-              </div>
-            </div>
-            <p class="relative mt-6 text-base leading-7 text-gray-300 pb-5">
-              {examData.exam.description}
-              <span class="absolute bottom-0 right-0 text-sm italic">
-                {' '}
-                autor: {examData.exam.user.displayName}
-              </span>
-            </p>
-            <div class="pr-6 pl-6 md:ml-auto md:w-2/3 md:pl-16 lg:w-1/2 lg:pl-24 lg:pr-0 xl:pl-32"></div>
-            <div class="mt-8">
-              <div
+                }}
                 class={
-                  statusSignal.value === 'running'
-                    ? 'text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-green-400'
-                    : 'text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-red-400'
+                  emailSent.value
+                    ? 'inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm'
+                    : 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
                 }
               >
-                <a
-                  style={statusSignal.value === 'running' ? '' : 'pointer-events:none'}
-                  href={statusSignal.value === 'running' ? workspaceState.workspaceLink : ''}
-                  target={'_blank'}
-                >
-                  {statusSignal.value === 'running' ? 'Začni písať test' : statusSignal.value}
-                </a>
-              </div>
+                {emailSent.value ? 'Údaje poslané' : 'Znova poslať údaje'}
+              </button>
             </div>
-            <div class="mt-8">
+          </div>
+          <p class="relative mt-6 text-base leading-7 text-gray-300 pb-5">
+            {examData.exam.description}
+            <span class="absolute bottom-0 right-0 text-sm italic">
+              {' '}
+              autor: {examData.exam.user.displayName}
+            </span>
+          </p>
+          <div class="pr-6 pl-6 md:ml-auto md:w-2/3 md:pl-16 lg:w-1/2 lg:pl-24 lg:pr-0 xl:pl-32"></div>
+          <div class="mt-8">
+            <div
+              class={
+                statusSignal.value === 'running'
+                  ? 'text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-green-400'
+                  : 'text-2xl uppercase text-center p-2 animate-pulse duration-1000 font-semibold leading-7 text-white bg-red-400'
+              }
+            >
               <a
-                href={`${appUrl}student`}
-                class="flex text-base font-semibold leading-7 text-indigo-400"
+                style={statusSignal.value === 'running' ? '' : 'pointer-events:none'}
+                href={statusSignal.value === 'running' ? workspaceState.workspaceLink : ''}
+                target={'_blank'}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6 mr-1"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-                  />
-                </svg>
-                späť
+                {statusSignal.value === 'running' ? 'Začni písať test' : statusSignal.value}
               </a>
             </div>
+          </div>
+          <div class="mt-8">
+            <a
+              href={`${appUrl}student`}
+              class="flex text-base font-semibold leading-7 text-indigo-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6 mr-1"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+                />
+              </svg>
+              späť
+            </a>
           </div>
         </div>
       </div>

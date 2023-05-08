@@ -6,7 +6,6 @@ export interface EvaluationProps {
   test: any;
   exam: any;
   user: any;
-  isAuthorized: boolean;
 }
 
 export const Evaluation = component$<EvaluationProps>((props) => {
