@@ -23,7 +23,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
   const state = useStore({
     examTests: [] as any,
     displayTests: [] as ScoreTests[],
-    scoreData: [] as any,
+    scoreData: {} as any,
     showGit: false,
     message: '',
     loading: false,
