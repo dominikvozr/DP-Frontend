@@ -33,21 +33,19 @@ export class TestApi {
     }
   };
 
-  static getTests = async (cookies: any) => {
+  static getTests = async (cookies: any, page: string | null) => {
     try {
-      const res = await fetch(baseUrl + 'api/v1/student/test/index', {
+      const res = await fetch(baseUrl + 'api/v1/student/test/index?page=' + page, {
         method: 'GET',
         credentials: 'include',
         headers: {
           Cookie: cookies,
         },
       });
-      const { user, tests, isAuthorized } = await res.json();
+      const data = await res.json();
+      console.log(data);
 
-      /* const userData = user? new User(user) : undefined
-      const examsData = exams? exams.map((exam) => new Exam(exam)) : undefined */
-
-      return { user, tests, isAuthorized };
+      return data;
     } catch (e) {
       console.error(e);
     }

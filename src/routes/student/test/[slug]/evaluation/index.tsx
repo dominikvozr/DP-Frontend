@@ -190,7 +190,7 @@ export default component$(() => {
 				<div class="mt-2">
 					<textarea onInput$={(evt: any) => {
 						state.message = evt.target.value
-					}} rows={4} name="comment" id="comment" placeholder="I need to check test case number 1 because..." class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"></textarea>
+					}} rows={4} name="comment" id="comment" value={state.message} placeholder="I need to check test case number 1 because..." class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"></textarea>
 				</div>
 			</div>
 			<div class="flex justify-center mb-4">
@@ -199,9 +199,13 @@ export default component$(() => {
 					onClick$={async() => {
 						state.loading = true
 						const result: any = await ReportApi.createReport({ testId: dataResource.value.test._id, message: state.message })
-						state.loading = false
 						if (result.status === 200) {
 							state.alert = true
+							state.loading = false
+							state.message = ''
+							setTimeout(() => {
+								state.alert = false
+							}, 3000);
 						}
 					}}
 				>

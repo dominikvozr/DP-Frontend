@@ -9,6 +9,7 @@ export function dateDifference(date1: Date, date2: Date) {
     { name: 'd', divisor: 1000 * 60 * 60 * 24 },
     { name: 'h', divisor: 1000 * 60 * 60 },
     { name: 'min', divisor: 1000 * 60 },
+    { name: 's', divisor: 1000 },
   ];
 
   for (const unit of units) {

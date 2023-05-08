@@ -19,10 +19,10 @@ export class ReportApi {
 
   static reply = async (data: any, testId: string) => {
     try {
-      const res = await fetch(baseUrl + 'api/v1/report/update', {
+      const res = await fetch(baseUrl + 'api/v1/report/update/' + testId, {
         method: 'PUT',
         credentials: 'include',
-        body: JSON.stringify({ data, testId }),
+        body: JSON.stringify(data),
         headers: {
           'content-type': 'application/json',
         },

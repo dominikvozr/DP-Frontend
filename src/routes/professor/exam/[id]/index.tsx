@@ -14,6 +14,15 @@ import { ExamModalDataContext } from '~/contexts/contexts';
 import { ReportApi } from '~/db/ReportApi';
 import { Evaluation } from '~/components/professor/evaluation';
 
+interface Report {
+  _id: string,
+  user: any,
+  test: any,
+  message: string,
+  createdAt: Date,
+  isOpen: boolean,
+}
+
 export const onGet: RequestHandler = async ({ redirect, request }) => {
   const { isAuthorized } = await UserApi.checkAuthorization(request.headers.get('cookie'));
   if (!isAuthorized) {
@@ -45,8 +54,9 @@ export default component$(() => {
     endDate: new Date(),
     testOrder: -1,
     test: {} as any,
+    reports: [] as Report[],
     replies: {} as any,
-    savedHide: [] as any,
+    //savedHide: [] as any,
   });
   const dataResource = useExamData();
   const examModalData = useStore({
@@ -61,6 +71,7 @@ export default component$(() => {
     dataResource.value.tests.map((test: any) => {
       if (test.user.email == loc.url.searchParams.get('email'))
       state.test = test
+      state.reports = test.reports
     })
 
     if(loc.url.searchParams.has('tab'))
@@ -129,7 +140,7 @@ export default component$(() => {
                 {/* Profile header */}
                 {!_.isEmpty(state.test) && (
                   <>
-                    <div class={profileTabs.active === 'evaluation'? 'hidden': ''}>
+                    <div class={profileTabs.active === 'evaluation' ? 'hidden' : ''}>
                       <div>
                         <img
                           class="h-32 w-full object-cover lg:h-48"
@@ -221,14 +232,13 @@ export default component$(() => {
                     <Evaluation user={state.test.user} test={state.test} exam={dataResource.value.exam} />
                   </div>
                   <div class={`p-2 ${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
-                    {state.test.reports && state.test.reports.map((report: any, index: number) => (
+                    {state.reports?.map((report: Report) => (
                         <>
-                          <div key={index} class={`grid grid-cols-12 ${state.savedHide.includes(report._id) ? 'hidden': ''}`}>
+                          <div key={report._id} class="grid grid-cols-12">
                             <div class="col-span-2">{report.message}:</div>
                             <input
                               class="col-span-4"
                               type="text"
-                              value={report.value}
                               onInput$={(evt: any) => {
                                 if (!evt.target.value) {
                                   delete state.replies[report._id]
@@ -241,13 +251,16 @@ export default component$(() => {
                         </>
                       )
                     )}
-                    { state.test.reports ? (<button
+                    { state.reports.length ? (<button
                       type="submit"
                       class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       onClick$={async () => {
-                        if (!state.replies.length) return
+                        const keys = Object.keys(state.replies)
+                        if (!keys.length) return
                         await ReportApi.reply(state.replies, state.test._id);
-                        state.savedHide += Object.keys(state.replies)
+                        state.reports = state.reports.filter((report: any) => !keys.includes(report._id))
+                        console.log(state.reports);
+
                       }}
                     >
                       save
@@ -269,6 +282,7 @@ export default component$(() => {
                       class="sticky top-0 z-10 border-t border-b border-gray-200 bg-gray-50 hover:bg-gray-100 px-6 py-1 text-sm font-medium text-gray-500 hover:cursor-pointer"
                       onClick$={() => {
                         state.test = test;
+                        state.reports = test.reports;
                         state.testOrder = index;
                         profileTabs.active = 'profile';
                       }}

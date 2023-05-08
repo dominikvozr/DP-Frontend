@@ -1,46 +1,120 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useStore, $ } from '@builder.io/qwik';
+import { EventApi } from '~/db/EventApi';
+import { appUrl } from '~/db/url';
+import { dateDifference } from '~/helpers/dateHelper';
+import { eventClassMapping } from '~/helpers/eventClassMapping';
 
-export const ActivityBar = component$(() => {
-  const activityItems = [
-    { project: 'Workcation', commit: '2d89f0c8', environment: 'production', time: '1h' },
-    // More items...
-  ];
+interface ActivityBarProps {
+  events: any[];
+}
+
+export const ActivityBar = component$<ActivityBarProps>((props) => {
+  const state = useStore({
+    events: props.events,
+    maxEvents: 8,
+  });
+  const nowDate = new Date();
+  const getEventClass = $((type: string): string => {
+    return eventClassMapping[type] || 'bg-gray-500';
+  });
   return (
     <>
       {/* Activity feed */}
       <div class="pl-6 lg:w-80">
-        <div class="pt-6 pb-2">
+        <div class="pt-6 pb-2 flex space-x-1">
           <h2 class="text-sm font-semibold">Activity</h2>
+          <span class="relative top-0.5 text-xs text-gray-500">
+            {state.events ? `(${state.events.length})` : '(0)'}
+          </span>
         </div>
         <div>
           <ul role="list" class="divide-y divide-gray-200">
-            {activityItems.map((item) => (
-              <li key={item.commit} class="py-4">
-                <div class="flex space-x-3">
-                  <img
-                    class="h-6 w-6 rounded-full"
-                    src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&h=256&q=80"
-                    alt=""
-                  />
-                  <div class="flex-1 space-y-1">
-                    <div class="flex items-center justify-between">
-                      <h3 class="text-sm font-medium">You</h3>
-                      <p class="text-sm text-gray-500">{item.time}</p>
+            {state.events?.map(async (event: any, index: number) => {
+              if (index < state.maxEvents)
+                return (
+                  <li
+                    key={index}
+                    class={`p-4 my-1.5 rounded-lg ${await getEventClass(event.type)}`}
+                  >
+                    <div class="flex space-x-3">
+                      {event.fromUser && (
+                        <img
+                          class="h-6 w-6 rounded-full self-center"
+                          src={event.fromUser.avatarUrl}
+                          alt="avatar"
+                        />
+                      )}
+                      <div class="flex-1 flex flex-col justify-center truncate">
+                        <div class="flex items-center justify-between">
+                          <h3 class="text-sm font-medium truncate">{event.name}</h3>
+                          <p class="text-sm text-gray-500">
+                            {dateDifference(nowDate, new Date(event.createdAt))}
+                          </p>
+                        </div>
+                        <p class="text-sm text-gray-500 truncate">{event.description}</p>
+                      </div>
+                      <div class="flex flex-col">
+                        <button
+                          class="self-center bg-white px-1.5 my-1 text-sm rounded-lg"
+                          onClick$={async () => {
+                            const res: Response | undefined = await EventApi.hideEvent(event._id);
+                            if (res && res.status == 200)
+                              state.events = state.events.filter(
+                                (evt: any) => evt._id !== event._id,
+                              );
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="#DC2626"
+                            class="w-5 h-5"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                        {event.link && (
+                          <a
+                            class="bg-white px-1.5 my-1 text-sm rounded-lg"
+                            href={appUrl + event.link}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-5 h-5"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                              />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p class="text-sm text-gray-500">
-                      Deployed {item.project} ({item.commit} in master) to {item.environment}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
+                  </li>
+                );
+            })}
+            {!state.events && <>no activity :(</>}
           </ul>
-          <div class="border-t border-gray-200 py-4 text-sm">
-            <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-900">
-              View all activity
-              <span aria-hidden="true"> &rarr;</span>
-            </a>
-          </div>
+          {state.events.length > state.maxEvents && (
+            <div class="py-4 text-sm">
+              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-900">
+                View all activity
+                <span aria-hidden="true"> &rarr;</span>
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </>

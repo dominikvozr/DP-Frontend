@@ -7,14 +7,16 @@ import { appUrl } from '~/db/url';
 export interface PaginationProps {
   count: number;
   active: number;
+  dashboard: string;
 }
 
 export const Pagination = component$<PaginationProps>((props) => {
   const QArrowLongLeftIcon = qwikify$(ArrowLongLeftIcon);
   const QArrowLongRightIcon = qwikify$(ArrowLongRightIcon);
-
+  const m = props.count / 8;
+  const page = Math.floor(m);
   const state = useStore({
-    pages: Math.floor(props.count / 8),
+    pages: m > page ? page + 1 : page,
     active: props.active || 1,
   });
 
@@ -38,7 +40,7 @@ export const Pagination = component$<PaginationProps>((props) => {
                   <>
                     <a
                       key={i}
-                      href={`${appUrl}professor?page=` + (i + 1)}
+                      href={`${appUrl + props.dashboard}?page=` + (i + 1)}
                       class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 border-indigo-300 hover:text-gray-700"
                     >
                       {i + 1}
@@ -53,7 +55,7 @@ export const Pagination = component$<PaginationProps>((props) => {
                   <>
                     <a
                       key={i}
-                      href={`${appUrl}professor?page=` + (i + 1)}
+                      href={`${appUrl + props.dashboard}?page=` + (i + 1)}
                       class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
                     >
                       {i + 1}
@@ -70,7 +72,7 @@ export const Pagination = component$<PaginationProps>((props) => {
         </div>
         <div class="-mt-px flex w-0 flex-1 justify-end">
           <a
-            href={appUrl + 'professor?page=' + state.pages}
+            href={appUrl + props.dashboard + '?page=' + state.pages}
             class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
           >
             Last
