@@ -64,6 +64,7 @@ export default component$(() => {
     workSpaceMemory: 2,
     workSpaceDisk: 2,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    dateValidationPrompt: '',
   });
 
   const loading = useSignal<boolean>(false);
@@ -82,13 +83,51 @@ export default component$(() => {
       : '';
   });
 
-  useVisibleTask$(async () => {
+  useVisibleTask$(() => {
     initTE({ Input, Timepicker, Datepicker });
     const startPicker = document.querySelector('#start-timepicker-format');
     const endPicker = document.querySelector('#end-timepicker-format');
+    const datepickerStart = document.querySelector('#start-datepicker');
+    const datepickerEnd = document.querySelector('#end-datepicker');
     new Timepicker(startPicker, { format24: true });
     new Timepicker(endPicker, { format24: true });
+    new Datepicker(datepickerStart, {
+      disablePast: true
+    });
+    new Datepicker(datepickerEnd, {
+      disablePast: true
+    });
   });
+
+  const validateDates = $(() => {
+    // Concatenate date and time strings and convert to Date objects
+    const date1 = new Date(state.startDate + " " + state.startTime);
+    const date2 = new Date(state.endDate + " " + state.endTime);
+
+    // Get current date
+    const now = new Date();
+
+    // Check if date1 is in the past
+    if (date1.getTime() < now.getTime()) {
+      // console.log("date1 must not be from the past");
+      state.dateValidationPrompt = 'date1 must not be from the past'
+      return false;
+    }
+
+    // Add 10 minutes (10*60*1000 milliseconds) to date1
+    const minDelay = new Date(date1.getTime() + 10 * 60 * 1000);
+
+    // Check if date2 is at least 10 minutes after date1
+    if (date2.getTime() < minDelay.getTime()) {
+      // console.log("date2 must be at least 5 minutes after date1");
+      state.dateValidationPrompt = 'date2 must be at least 10 minutes after date1'
+      return false;
+    }
+
+    // console.log("Both dates are valid");
+    state.dateValidationPrompt = ''
+    return true;
+  })
 
   return (
     <>
@@ -157,7 +196,10 @@ export default component$(() => {
                           ></textarea>
                         </div>
                       </div>
-                      <div class="grid grid-cols-2 gap-6">
+                      <div class={`bg-white mx-4 px-2 relative text-center text-red-600 text-sm top-[36px] ${state.dateValidationPrompt !== '' ? 'inline-block': 'hidden' }`}>
+                        {state.dateValidationPrompt}
+                      </div>
+                      <div class={`grid grid-cols-2 gap-6 ${state.dateValidationPrompt !== '' ? 'border border-red-600 p-2.5' : ''}`}>
                         <div class="flex space-x-3 sm:pt-5">
                           <label
                             for="start-date"
@@ -167,6 +209,7 @@ export default component$(() => {
                           </label>
                           <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
                             <div
+                              id='start-datepicker'
                               class="relative mb-3"
                               data-te-datepicker-init
                               data-te-input-wrapper-init
@@ -176,8 +219,8 @@ export default component$(() => {
                                 class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 placeholder="Select a date"
                                 onInput$={(ev: any) => {
-                                  console.log(ev.target.value);
                                   state.startDate = ev.target.value;
+                                  validateDates()
                                 }}
                               />
                               <label
@@ -199,8 +242,8 @@ export default component$(() => {
                                 data-te-toggle="timepicker"
                                 id="form14"
                                 onInput$={(ev: any) => {
-                                  console.log(convertToGMT(ev.target.value));
                                   state.startTime = convertToGMT(ev.target.value);
+                                  validateDates()
                                 }}
                               />
                               <label
@@ -221,6 +264,7 @@ export default component$(() => {
                           </label>
                           <div class="mt-1 sm:col-span-2 sm:mt-0 flex-1">
                             <div
+                              id='end-datepicker'
                               class="relative mb-3"
                               data-te-datepicker-init
                               data-te-input-wrapper-init
@@ -230,8 +274,8 @@ export default component$(() => {
                                 class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 placeholder="Select a date"
                                 onInput$={(ev: any) => {
-                                  console.log(ev.target.value);
                                   state.endDate = ev.target.value;
+                                  validateDates()
                                 }}
                               />
                               <label
@@ -252,8 +296,8 @@ export default component$(() => {
                                 class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 data-te-toggle="timepicker"
                                 onInput$={(ev: any) => {
-                                  console.log(convertToGMT(ev.target.value));
                                   state.endTime = convertToGMT(ev.target.value);
+                                  validateDates()
                                 }}
                                 id="form14"
                               />
@@ -295,7 +339,7 @@ export default component$(() => {
                                   class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                                 >
                                   <span>Nahraj projekt (.zip)</span>
-                                  <div>{state.project && `${state.project.originalname}`}</div>
+                                  <div>{state.project.originalname && `${state.project.originalname}`}</div>
                                   <input
                                     id="file-upload"
                                     name="project"
@@ -340,9 +384,11 @@ export default component$(() => {
                                   class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                                 >
                                   <span>Nahraj testy</span>
-                                  <div>{state.tests ? state.tests.map((tt: any) => {
-                                    `${tt.originalname} `
-                                  }) : ''}</div>
+                                  <ul>
+                                    {state.tests ? state.tests.map((tt: any) => (
+                                      <li key={tt.classname}>{tt.testsFile.originalname} </li>
+                                    )) : ''}
+                                  </ul>
                                   <input
                                     id="tests"
                                     name="tests"
@@ -607,6 +653,13 @@ export default component$(() => {
                 </>
               ))
             : null}
+
+          <div class="hidden sm:block" aria-hidden="true">
+            <div class="py-5">
+              <div class="border-t border-gray-200"></div>
+            </div>
+          </div>
+
           {state.tests.length ? (
             <>
               <div class="bg-gray-50 flex flex-col justify-center px-4 py-3 sm:px-6 space-x-6 text-right">
@@ -615,6 +668,8 @@ export default component$(() => {
                   type="submit"
                   disabled={loading.value}
                   onClick$={async () => {
+                    validateDates()
+                    if (state.dateValidationPrompt || _.isEmpty(state.project)) return
                     //const { value } = await handleCreate.run(state);
                     const res = await ExamApi.createExam(state);
                     if (res.message === 'success') window.location = `${appUrl}professor` as any;

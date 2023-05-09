@@ -37,7 +37,7 @@ export const TestItem = component$<TestItemProps>((props) => {
           </span>
 
           <h2 class="text-sm font-medium">
-            <a href={`${appUrl}student/test/${props.test.slug}`}>
+            <a href={`${appUrl}student/test/${props.test.examSlug}`}>
               <span class="absolute inset-0" aria-hidden="true" />
               {props.test.exam.name}{' '}
               <span class="sr-only">{props.test.isOpen ? 'Running' : 'Not running'}</span>

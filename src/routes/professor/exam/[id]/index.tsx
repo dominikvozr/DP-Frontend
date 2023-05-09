@@ -35,6 +35,8 @@ export const useExamData = routeLoader$(async ({ params, request }) => {
     params.id,
     request.headers.get('cookie'),
   );
+  console.log(exam, tests);
+
   return { exam, tests, isAuthorized, user };
 });
 
