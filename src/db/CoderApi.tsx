@@ -111,9 +111,7 @@ export class CoderApi {
                 'Accept': 'application/json'
             },
         });
-        const response =await res.json()
-        console.log(response)
-        return response
+        return await res.json()
     }
     static getSession = async (username: string, workspaceName:string, cookies:any) => {
         const res = await fetch(baseUrl + `api/v1/coder/workspaces/session/${username}/${workspaceName}`, {
