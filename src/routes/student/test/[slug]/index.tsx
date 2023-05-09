@@ -40,7 +40,7 @@ export const useTestData = routeLoader$(async ({ request, params }) => {
   if (startDate <= currentDate && currentDate <= endDate) data.exam.isOpen = true;
   else data.exam.isOpen = false;
   if (_.isEmpty(data?.test) && data.exam.isOpen)
-    data.test = await ExamApi.createRepo(request.headers.get('cookie'), data.exam.id);
+    data.test = await ExamApi.createRepo(request.headers.get('cookie'), data.exam._id);
   return { test: data?.test, exam: data?.exam, user: data?.user, isAuthorized: data?.isAuthorized };
 });
 
@@ -126,7 +126,7 @@ export default component$(() => {
   return (
     <>
       {/* display test if exist */}
-      {!_.isEmpty(testState.test) && !testState.test?.score.tests.length && (
+      {!_.isEmpty(testState.test) && !testState.test?.score?.tests.length && (
         <div class="relative flex min-h-full flex-col bg-indigo-400">
           <TestInvitation />
         </div>
@@ -139,7 +139,7 @@ export default component$(() => {
         </div>
       )}
       {/* display a test evaluation */}
-      {testState.test?.score.tests.length && (
+      {testState.test?.score?.tests.length && (
         <Evaluation exam={examState.exam} test={testState.test} user={dataResource.value?.user} />
       )}
       {/* display a sad image if exam is closed */}

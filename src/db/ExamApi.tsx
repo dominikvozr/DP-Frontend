@@ -1,21 +1,24 @@
 import { baseUrl } from '~/db/url';
 
 export class ExamApi {
-  static createRepo = async (cookies: any,data: any) =>{
-    try{
-      const res = await fetch(baseUrl+'api/v1/student/test/create', {
+  static createRepo = async (cookies: any, examId: string) => {
+    try {
+      const res = await fetch(baseUrl + 'api/v1/student/test/create', {
         method: 'POST',
         credentials: 'include',
-        body: JSON.stringify(data),
+        body: JSON.stringify({ examId }),
         headers: {
           'content-type': 'application/json',
-        }
+          Cookie: cookies,
+        },
       });
-      return await res.json();
-    }catch (e){
+      const d = await res.json();
+      console.log(d);
+      return d;
+    } catch (e) {
       console.error(e);
     }
-  }
+  };
   static createExam = async (data: any) => {
     try {
       const res = await fetch(baseUrl + 'api/v1/professor/exam/create', {
