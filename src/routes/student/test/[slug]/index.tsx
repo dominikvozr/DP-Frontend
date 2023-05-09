@@ -52,6 +52,7 @@ export const createAndOrLogin = routeLoader$(async (requestEvent) => {
       return { userObject: loginUser, isLogged: true };
     } else {
       const newUserLogin = await CoderApi.createUser(requestEvent.request.headers.get('cookie'));
+      console.log(newUserLogin)
       if (newUserLogin) {
         return { userObject: newUserLogin, isLogged: true };
       }
@@ -72,8 +73,8 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
         cookie,
       );
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
+        console.log(data.test)
         const workspace = await CoderApi.createWorkspace(data.user, data.test, data.exam, cookie);
-        console.log(workspace);
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
           user.userObject.username,
