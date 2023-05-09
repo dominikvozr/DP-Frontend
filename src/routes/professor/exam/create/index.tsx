@@ -65,6 +65,10 @@ export default component$(() => {
     workSpaceDisk: 2,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     dateValidationPrompt: '',
+    nameValidationPrompt: '',
+    projectValidationPrompt: '',
+    alert: false,
+    loading: false,
   });
 
   const loading = useSignal<boolean>(false);
@@ -98,8 +102,36 @@ export default component$(() => {
       disablePast: true
     });
   });
+  const validateName = $(() : boolean => {
+    if (state.name.length){
+      state.nameValidationPrompt = ''
+      return false
+    }
+    state.nameValidationPrompt = 'Exam Name is required!'
+    return true
+  })
 
-  const validateDates = $(() => {
+  const validateProject = $(() : boolean => {
+    if (!_.isEmpty(state.project)) {
+      state.projectValidationPrompt = ''
+      return false
+    }
+    state.projectValidationPrompt = 'Poject is required!'
+    return true
+  })
+
+  const validateDates = $(() : boolean => {
+    state.dateValidationPrompt = ''
+    if(_.isEmpty(state.startDate))
+      state.dateValidationPrompt += 'invalid Date 1'
+    if (_.isEmpty(state.startTime))
+      state.dateValidationPrompt += ' invalid Time 1'
+    if (_.isEmpty(state.endDate))
+      state.dateValidationPrompt += ' invalid Date 2'
+    if (_.isEmpty(state.endTime))
+      state.dateValidationPrompt += ' invalid Time 2'
+    if (state.dateValidationPrompt) return true
+
     // Concatenate date and time strings and convert to Date objects
     const date1 = new Date(state.startDate + " " + state.startTime);
     const date2 = new Date(state.endDate + " " + state.endTime);
@@ -109,9 +141,9 @@ export default component$(() => {
 
     // Check if date1 is in the past
     if (date1.getTime() < now.getTime()) {
-      // console.log("date1 must not be from the past");
+      console.log("date1 must not be from the past");
       state.dateValidationPrompt = 'date1 must not be from the past'
-      return false;
+      return true;
     }
 
     // Add 10 minutes (10*60*1000 milliseconds) to date1
@@ -119,14 +151,14 @@ export default component$(() => {
 
     // Check if date2 is at least 10 minutes after date1
     if (date2.getTime() < minDelay.getTime()) {
-      // console.log("date2 must be at least 5 minutes after date1");
+      console.log("date2 must be at least 5 minutes after date1");
       state.dateValidationPrompt = 'date2 must be at least 10 minutes after date1'
-      return false;
+      return true;
     }
 
-    // console.log("Both dates are valid");
+    console.log("Both dates are valid");
     state.dateValidationPrompt = ''
-    return true;
+    return false;
   })
 
   return (
@@ -148,7 +180,10 @@ export default component$(() => {
                 <form action="#" method="POST">
                   <div class="shadow sm:overflow-hidden sm:rounded-md">
                     <div class="space-y-6 bg-white px-4 py-5 sm:p-6">
-                      <div class="grid grid-cols-6 gap-6">
+                      <div class={`bg-white mx-4 px-2 relative text-center text-red-600 text-sm top-[36px] ${state.nameValidationPrompt !== '' ? 'inline-block' : 'hidden'}`}>
+                        {state.nameValidationPrompt}
+                      </div>
+                        <div class={`grid grid-cols-6 gap-6 ${state.nameValidationPrompt !== '' ? 'border border-red-600 p-2.5' : ''}`}>
                         <div class="col-span-6 sm:col-span-3">
                           <label for="name" class="block text-sm font-medium text-gray-700">
                             Názov testu
@@ -159,6 +194,7 @@ export default component$(() => {
                             id="name"
                             onInput$={(ev: any) => {
                               state.name = ev.target.value;
+                              validateName()
                             }}
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           />
@@ -312,7 +348,10 @@ export default component$(() => {
                         </div>
                       </div>
 
-                      <div class="grid grid-cols-2 gap-6">
+                      <div class={`bg-white mx-4 px-2 relative text-center text-red-600 text-sm top-[36px] ${state.projectValidationPrompt !== '' ? 'inline-block' : 'hidden'}`}>
+                        {state.projectValidationPrompt}
+                      </div>
+                      <div class={`grid grid-cols-2 gap-6 ${state.projectValidationPrompt !== '' ? 'border border-red-600 p-2.5' : ''}`}>
                         <div>
                           <label class="block text-sm font-medium text-gray-700">
                             Začiatočný projekt
@@ -350,6 +389,7 @@ export default component$(() => {
                                         ev.target.files,
                                       );
                                       state.project = data;
+                                      validateProject()
                                     }}
                                     type="file"
                                     class="sr-only"
@@ -668,16 +708,69 @@ export default component$(() => {
                   type="submit"
                   disabled={loading.value}
                   onClick$={async () => {
-                    validateDates()
-                    if (state.dateValidationPrompt || _.isEmpty(state.project)) return
-                    //const { value } = await handleCreate.run(state);
-                    const res = await ExamApi.createExam(state);
+                    state.loading = true;
+                    if ( await validateName() ||  await validateProject() || await validateDates()) {
+                      window.scrollTo(0, 0);
+                      state.loading = false;
+                      return
+                    }
+                    const res: any = await ExamApi.createExam(state);
+                    state.loading = false;
+                    if (res.status === 200) {
+                      state.alert = true;
+                    }
                     if (res.message === 'success') window.location = `${appUrl}professor` as any;
                   }}
                   class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                   Uložiť test
                 </button>
+                <div
+                  class={`${state.loading ? 'block' : 'hidden'
+                    } inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
+                  role="status"
+                >
+                  <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                    Loading...
+                  </span>
+                </div>
+                <div
+                  class={`${state.alert ? 'block' : 'hidden'
+                    } fixed bottom-10 right-10 rounded-md bg-green-50 p-4`}
+                >
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="h-5 w-5 text-green-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800">Evaluation saved</h3>
+                      <div class="mt-4">
+                        <div class="-mx-2 -my-1.5 flex">
+                          <button
+                            type="button"
+                            onClick$={() => {
+                              state.alert = false;
+                            }}
+                            class="ml-3 rounded-md bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50"
+                          >
+                            close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           ) : null}

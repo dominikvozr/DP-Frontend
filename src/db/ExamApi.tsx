@@ -29,7 +29,7 @@ export class ExamApi {
           'content-type': 'application/json',
         },
       });
-      return await res.json();
+      return res;
     } catch (e) {
       console.error(e);
     }

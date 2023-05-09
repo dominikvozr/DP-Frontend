@@ -59,7 +59,7 @@ export const Header = component$(() => {
                 onClick$={async () => {
                   const data: { message: string } = await UserApi.logout();
                   if (data.message === 'success') {
-                    nav(`${appUrl}login`);
+                    window.location = `${appUrl}login` as any;
                   }
                 }}
               >
