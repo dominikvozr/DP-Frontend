@@ -48,8 +48,8 @@ export class CoderApi {
     static createWorkspace = async (user: any,data: any, workspaceConf: any,cookies: any) => {
 
         try {
-            const endDate = new Date(data.endDate);
-            let startDate = new Date(data.startDate)
+            const endDate = new Date(workspaceConf.endDate);
+            let startDate = new Date(workspaceConf.startDate)
             const repo = `${user.gitea.username}/${data.slug}-student`;
             const git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
 
@@ -83,9 +83,9 @@ export class CoderApi {
                 name: data.slug,
                 rich_parameter_values: params,
                 ttl_ms: ttl_ms,
-                template_id: data.templateId,
+                template_id: workspaceConf.templateId,
             }
-            console.log('body:' + body )
+            console.log(body)
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',
