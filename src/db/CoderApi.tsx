@@ -80,7 +80,7 @@ export class CoderApi {
                 },
             ]
             const body = {
-                name: data.slug,
+                name: workspaceConf.slug,
                 rich_parameter_values: params,
                 ttl_ms: ttl_ms,
                 template_id: workspaceConf.templateId,

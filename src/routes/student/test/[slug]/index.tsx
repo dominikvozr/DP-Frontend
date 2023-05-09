@@ -48,7 +48,6 @@ export const createAndOrLogin = routeLoader$(async (requestEvent) => {
   const data = await requestEvent.resolveValue(useTestData);
   if (data?.exam?.isOpen) {
     const loginUser = await CoderApi.login(requestEvent.request.headers.get('cookie'));
-
     if (loginUser?.id) {
       return { userObject: loginUser, isLogged: true };
     } else {
@@ -69,7 +68,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
     if (user.isLogged) {
       const workspaceStatus = await CoderApi.getStatus(
         user.userObject.username,
-        data.test.slug,
+        data.exam.slug,
         cookie,
       );
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
@@ -78,7 +77,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
           user.userObject.username,
-          data.test.slug,
+          data.exam.slug,
           cookie,
         );
         return {
@@ -90,7 +89,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
       } else {
         const accessData = await CoderApi.getSession(
           user.userObject.username,
-          data.test.slug,
+          data.exam.slug,
           cookie,
         );
         return {
