@@ -51,6 +51,7 @@ export class CoderApi {
             const endDate = new Date(workspaceConf.endDate);
             let startDate = new Date(workspaceConf.startDate)
             const repo = data.testRepo;
+            console.log(data.testRepo)
             let git = undefined
             if(repo){
                 git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
@@ -87,7 +88,7 @@ export class CoderApi {
                 ttl_ms: ttl_ms,
                 template_id: workspaceConf.templateId,
             }
-            console.log(body)
+
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',

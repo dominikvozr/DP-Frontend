@@ -52,7 +52,6 @@ export const createAndOrLogin = routeLoader$(async (requestEvent) => {
       return { userObject: loginUser, isLogged: true };
     } else {
       const newUserLogin = await CoderApi.createUser(requestEvent.request.headers.get('cookie'));
-      console.log(newUserLogin)
       if (newUserLogin) {
         return { userObject: newUserLogin, isLogged: true };
       }
@@ -81,7 +80,6 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           data.exam.slug,
           cookie,
         );
-        console.log(accessData)
         return {
           workspace: workspace,
           accessData: JSON.parse(accessData),
