@@ -45,7 +45,8 @@ export class CoderApi {
         }
     };
 
-    static createWorkspace = async (user: any,data: any,cookies: any) => {
+    static createWorkspace = async (user: any,data: any, workspaceConf: any,cookies: any) => {
+
         try {
             const endDate = new Date(data.endDate);
             let startDate = new Date(data.startDate)
@@ -62,16 +63,16 @@ export class CoderApi {
             }
             const params = [
                 {
-                    name: `${data.workSpaceCPU} Cores`,
-                    value: data.workSpaceCPU.toString()
+                    name: `${workspaceConf.workSpaceCPU} Cores`,
+                    value: workspaceConf.workSpaceCPU.toString()
                 },
                 {
-                    name: `${data.workSpaceMemory} GB`,
-                    value: data.workSpaceMemory.toString()
+                    name: `${workspaceConf.workSpaceMemory} GB`,
+                    value: workspaceConf.workSpaceMemory.toString()
                 },
                 {
                     name: "Home Disk Size (GB)",
-                    value: data.workSpaceDisk.toString()
+                    value: workspaceConf.workSpaceDisk.toString()
                 },
                 {
                     name: "Git repository",
@@ -84,7 +85,7 @@ export class CoderApi {
                 ttl_ms: ttl_ms,
                 template_id: data.templateId,
             }
-            console.log(body)
+            console.log('body:' + body )
             const res = await fetch(baseUrl + 'api/v1/coder/workspaces/', {
                 method: 'POST',
                 credentials: 'include',

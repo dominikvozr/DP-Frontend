@@ -69,11 +69,11 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
     if (user.isLogged) {
       const workspaceStatus = await CoderApi.getStatus(
         user.userObject.username,
-        data.exam.slug,
+        data.test.slug,
         cookie,
       );
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        const workspace = await CoderApi.createWorkspace(data.user, data.test, cookie);
+        const workspace = await CoderApi.createWorkspace(data.user, data.test, data.exam, cookie);
         console.log(workspace);
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
@@ -126,14 +126,14 @@ export default component$(() => {
   return (
     <>
       {/* display test if exist */}
-      {!_.isEmpty(testState.test) && !testState.test?.score?.tests.length && (
+      {/*{!_.isEmpty(testState.test) && !testState.test?.score?.tests.length && (
         <div class="relative flex min-h-full flex-col bg-indigo-400">
           <TestInvitation />
         </div>
-      )}
+      )} */}
 
       {/* display test invite if open */}
-      {_.isEmpty(testState.test) && examState.exam?.isOpen && (
+      {!_.isEmpty(testState.test) && examState.exam?.isOpen && (
         <div class="relative flex min-h-full flex-col bg-indigo-400">
           <TestShow />
         </div>
