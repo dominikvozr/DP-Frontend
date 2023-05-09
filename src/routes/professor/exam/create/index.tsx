@@ -58,7 +58,7 @@ export default component$(() => {
     tests: [] as any,
     pipeline: '',
     mainFile: '',
-    templateId: '6aa4e225-9fa5-4c03-aa7c-f393ea7a110b',
+    templateId: '6cc010ee-6a4b-4e44-8e5b-9de913643975',
     points: 0,
     workSpaceCPU: 2,
     workSpaceMemory: 2,
@@ -444,8 +444,8 @@ export default component$(() => {
                               default
                             </option>
                             <option
-                              value="961bbe6-096a-49a6-bc35-9c5bdce1df79"
-                              selected={state.templateId === '961bbe6-096a-49a6-bc35-9c5bdce1df79'}
+                              value="6cc010ee-6a4b-4e44-8e5b-9de913643975"
+                              selected={state.templateId === '6cc010ee-6a4b-4e44-8e5b-9de913643975'}
                             >
                               main
                             </option>
