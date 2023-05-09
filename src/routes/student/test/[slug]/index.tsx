@@ -73,7 +73,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
         cookie,
       );
       if (workspaceStatus.latest_build?.status === 'unfound' && data?.exam.isOpen) {
-        console.log(data.test)
+        console.log(data.test.testRepo)
         const workspace = await CoderApi.createWorkspace(data.user, data.test, data.exam, cookie);
         const email = await CoderApi.sentEmailWithLoginData(cookie);
         const accessData = await CoderApi.getSession(
@@ -81,6 +81,7 @@ export const createWorkspace = routeLoader$(async (requestEvent) => {
           data.exam.slug,
           cookie,
         );
+        console.log(accessData)
         return {
           workspace: workspace,
           accessData: JSON.parse(accessData),

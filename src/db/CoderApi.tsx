@@ -51,8 +51,10 @@ export class CoderApi {
             const endDate = new Date(workspaceConf.endDate);
             let startDate = new Date(workspaceConf.startDate)
             const repo = data.testRepo;
-            const git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
-
+            let git = undefined
+            if(repo){
+                git = `http://${user.gitea.accessToken.sha1}@bawix.xyz:81/gitea/${repo}`;
+            }
             if(startDate.getTime()<= new Date().getTime()){
                 startDate = new Date()
             }
