@@ -26,8 +26,11 @@ export const ActivityBar = component$<ActivityBarProps>((props) => {
             {state.events ? `(${state.events.length})` : '(0)'}
           </span>
         </div>
-        <div>
-          <ul role="list" class="divide-y divide-gray-200 overflow-y-auto h-[48rem] max-h-screen">
+        <div class="relative">
+          <ul
+            role="list"
+            class="divide-y divide-gray-200 pb-24 overflow-y-auto h-[48rem] max-h-screen"
+          >
             {state.events?.map(async (event: any, index: number) => (
               <li key={index} class={`p-4 my-1.5 rounded-lg ${await getEventClass(event.type)}`}>
                 <div class="flex space-x-3">
@@ -95,6 +98,7 @@ export const ActivityBar = component$<ActivityBarProps>((props) => {
             ))}
             {!state.events && <>no activity :(</>}
           </ul>
+          <div class="absolute bottom-0 left-0 bg-gradient-to-t from-white w-full h-36"></div>
         </div>
       </div>
     </>

@@ -1,4 +1,4 @@
-import { component$, useStore, useTask$ } from '@builder.io/qwik';
+import { component$, useOnDocument, useSignal, useStore, useTask$, $ } from '@builder.io/qwik';
 import _ from 'lodash';
 import { ReportApi } from '~/db/ReportApi';
 
@@ -15,10 +15,22 @@ export const Evaluation = component$<EvaluationProps>((props) => {
     message: '',
     loading: false,
     alert: false,
+    reports: props.test.reports as object[],
   });
+  const message = useSignal<Element>();
+
   useTask$(() => {
     state.examTests = props.exam.tests;
   });
+
+  useOnDocument(
+    'DOMContentLoaded',
+    $(() => {
+      if (message.value) {
+        message.value.scrollTop = message.value.scrollHeight;
+      }
+    }),
+  );
 
   return (
     <>
@@ -30,13 +42,14 @@ export const Evaluation = component$<EvaluationProps>((props) => {
           <p class="mt-6 text-lg leading-8 text-blue-600">{props.exam.description}</p>
           <button
             type="button"
+            disabled={state.showGit}
             onClick$={() => {
               state.showGit = true;
               setTimeout(() => {
                 state.showGit = false;
               }, 5000);
             }}
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            class="disabled:bg-gray-500 disabled:scale-90 transition inline-flex items-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             <svg
               class="-ml-0.5 h-5 w-5"
@@ -207,64 +220,48 @@ export const Evaluation = component$<EvaluationProps>((props) => {
       <div class={`${props.test.reports.length ? '' : 'hidden'}`}>
         <div class="bg-white px-6 py-3 lg:px-8">
           <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-              Resolved reviews
-            </h2>
+            <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">Reports</h2>
           </div>
         </div>
-        {props.test.reports &&
-          props.test.reports.map((report: any, index: number) => {
-            if (!report.isOpen) {
-              return (
+        <div class="w-[450px] h-[35rem] mx-auto px-5 flex flex-col justify-between">
+          <div ref={message} class="flex flex-col h-full mt-5 overflow-y-auto">
+            {state.reports &&
+              state.reports.map((report: any) => (
                 <>
-                  <div
-                    key={index}
-                    class="lg:col-span-2 mx-auto lg:col-start-1 lg:row-start-1 lg:mx-auto lg:grid lg:w-full lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8"
-                  >
-                    <div class="lg:pr-4">
-                      <div class="lg:max-w-lg">
-                        <div class="flex">
-                          <span class="text-sm">{props.user.displayName}</span>
-                          <h3 class="mt-2 text-xl font-bold tracking-tight text-gray-900">
-                            {report.message}
-                          </h3>
-                        </div>
-                        <div class="flex relative">
-                          <span class="text-sm absolute right-2">
-                            {props.test.exam.user.displayName}
-                          </span>
-                          <p class="mt-6 text-lg leading-8 text-gray-700">{report.response}</p>
-                        </div>
-                      </div>
+                  <div class="flex justify-end mb-4">
+                    <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
+                      {report.message}
+                    </div>
+                    <img
+                      src={props.user.avatarUrl}
+                      class="object-cover h-8 w-8 rounded-full border border-blue-600"
+                      alt=""
+                    />
+                  </div>
+                  <div class={`flex justify-start mb-4 ${report.response ? '' : 'hidden'}`}>
+                    <img
+                      src={props.test.exam.user.avatarUrl}
+                      class="object-cover h-8 w-8 rounded-full border border-indigo-600"
+                      alt=""
+                    />
+                    <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                      {report.response}
                     </div>
                   </div>
-                  <hr />
                 </>
-              );
-            }
-          })}
-      </div>
-      <div class="bg-white px-6 py-3 lg:px-8">
-        <div class="mx-auto max-w-2xl text-center">
-          <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">Review my test</h2>
-        </div>
-      </div>
-      <div class="mx-auto max-w-2xl text-center">
-        <label for="comment" class="block text-sm font-medium leading-6 text-gray-900">
-          Add your comment
-        </label>
-        <div class="mt-2">
-          <textarea
-            onInput$={(evt: any) => {
-              state.message = evt.target.value;
-            }}
-            rows={4}
-            name="comment"
-            id="comment"
-            value={state.message}
-            placeholder="I need to check test case number 1 because..."
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-          ></textarea>
+              ))}
+          </div>
+          <div class="py-5">
+            <input
+              class="w-full bg-gray-50 py-5 px-3 rounded-xl"
+              type="text"
+              onInput$={(evt: any) => {
+                state.message = evt.target.value;
+              }}
+              value={state.message}
+              placeholder="type your message here..."
+            />
+          </div>
         </div>
       </div>
       <div class="flex justify-center mb-4">
@@ -281,6 +278,9 @@ export const Evaluation = component$<EvaluationProps>((props) => {
             if (result.status === 200) {
               state.alert = true;
               state.loading = false;
+              state.reports.push({
+                message: state.message,
+              });
               state.message = '';
               setTimeout(() => {
                 state.alert = false;
@@ -288,7 +288,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
             }
           }}
         >
-          Report
+          Send
         </button>
         <div
           class={`${

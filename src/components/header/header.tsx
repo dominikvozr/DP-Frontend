@@ -27,9 +27,9 @@ export const Header = component$(() => {
         <div class="relative flex h-16 items-center justify-between">
           {/* Logo section */}
           <div class="flex items-center px-2 lg:px-0 xl:w-64">
-            <div class="flex-shrink-0">
+            <a href="/professor" class="flex-shrink-0">
               <Logo svgClass="w-20" color="#fff" />
-            </div>
+            </a>
           </div>
           {/* Links section */}
           <div class="flex">

@@ -2,13 +2,13 @@
 import { component$, useStore, useTask$, useContextProvider } from '@builder.io/qwik';
 import { DocumentHead, RequestHandler, routeLoader$, useLocation } from '@builder.io/qwik-city';
 import ChevronLeftIcon from '@heroicons/react/20/solid/ChevronLeftIcon';
-import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
-import CommandLineIcon from '@heroicons/react/20/solid/CommandLineIcon';
+/* import EnvelopeIcon from '@heroicons/react/20/solid/EnvelopeIcon';
+import CommandLineIcon from '@heroicons/react/20/solid/CommandLineIcon'; */
 import { qwikify$ } from '@builder.io/qwik-react';
 import { ExamApi } from '~/db/ExamApi';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
-import _ from 'lodash';
+import _, { isEmpty } from 'lodash';
 import { ExamModal } from '~/components/exam/modal';
 import { ExamModalDataContext } from '~/contexts/contexts';
 import { ReportApi } from '~/db/ReportApi';
@@ -19,6 +19,7 @@ interface Report {
   user: any,
   test: any,
   message: string,
+  response: string,
   createdAt: Date,
   isOpen: boolean,
 }
@@ -35,8 +36,6 @@ export const useExamData = routeLoader$(async ({ params, request }) => {
     params.id,
     request.headers.get('cookie'),
   );
-  console.log(exam, tests);
-
   return { exam, tests, isAuthorized, user };
 });
 
@@ -85,8 +84,6 @@ export default component$(() => {
   });
 
   const QChevronLeftIcon = qwikify$(ChevronLeftIcon);
-  const QEnvelopeIcon = qwikify$(EnvelopeIcon);
-  const QCommandLineIcon = qwikify$(CommandLineIcon);
   useContextProvider(ExamModalDataContext, examModalData);
 
   const profile = {
@@ -115,6 +112,7 @@ export default component$(() => {
                   preventdefault:click
                   onClick$={() => {
                     examModalData.open = true;
+                    document.body.classList.add('fixed', 'w-full')
                   }}
                 >
                   <svg
@@ -142,58 +140,30 @@ export default component$(() => {
                 {/* Profile header */}
                 {!_.isEmpty(state.test) && (
                   <>
-                    <div class={profileTabs.active === 'evaluation' ? 'hidden' : ''}>
+                    <div>
                       <div>
                         <img
-                          class="h-32 w-full object-cover lg:h-48"
+                          class={`w-full object-cover ${profileTabs.active === 'evaluation' ? 'h-16' : 'h-32 lg:h-48'}`}
                           src={profile.coverImageUrl}
                           alt=""
                         />
                       </div>
                       <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-                        <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-                          <div class="flex">
+                        <div class={`-mt-12 sm:-mt-16 sm:flex ${profileTabs.active === 'evaluation' ? 'relative top-1' : ''}`}>
+                          <div class="flex relative z-20">
                             <img
-                              class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                              class="h-24 w-24 rounded-full ring-2 ring-blue-600 sm:h-32 sm:w-32 bg-white"
                               src={state.test.user.avatarUrl}
                               alt=""
                             />
                           </div>
-                          <div class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-                            <div class="mt-6 min-w-0 flex-1 sm:hidden 2xl:block">
-                              <h1 class="truncate text-2xl font-bold text-gray-900">
+                          <div class="-left-[10px] relative sm:flex sm:flex-1 sm:items-center sm:justify-end sm:min-w-0 sm:pb-1 sm:space-x-6 z-10">
+                            <div class="min-w-0 flex-1 2xl:block">
+                              <h1 class="inline border-2 border-blue-600 bg-white px-6 py-2 rounded-r-lg truncate text-2xl font-bold text-blue-800">
                                 {state.test.user.displayName}
                               </h1>
                             </div>
-                            <div class="justify-stretch mt-6 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-                              <a
-                                href={`${appUrl}professor/test/${state.test.slug}/evaluation`}
-                                type="button"
-                                class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-                              >
-                                <QEnvelopeIcon
-                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                <span>Evaluation</span>
-                              </a>
-                              <button
-                                type="button"
-                                class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-                              >
-                                <QCommandLineIcon
-                                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                <span>Open workspace</span>
-                              </button>
-                            </div>
                           </div>
-                        </div>
-                        <div class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden">
-                          <h1 class="truncate text-2xl font-bold text-gray-900">
-                            {state.test.user.displayName}
-                          </h1>
                         </div>
                       </div>
                     </div>
@@ -234,37 +204,43 @@ export default component$(() => {
                     <Evaluation user={state.test.user} test={state.test} exam={dataResource.value.exam} />
                   </div>
                   <div class={`p-2 ${profileTabs.active !== 'reports' ? 'hidden' : ''}`}>
-                    {state.reports?.map((report: Report) => (
+                    {state.reports?.slice(0).reverse().map((report: Report) => (
                         <>
-                          <div key={report._id} class="grid grid-cols-12">
-                            <div class="col-span-2">{report.message}:</div>
-                            <input
-                              class="col-span-4"
-                              type="text"
-                              onInput$={(evt: any) => {
+                        <div key={report._id} class="flex justify-center items-center space-x-4 my-4">
+                            <div class="w-1/2">{report.message}</div>
+                            <div class="w-1/3 rounded-md px-3 pb-1.5 pt-2.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
+                              <label for="response" class="block text-xs font-medium text-gray-900">Response</label>
+                              <input type="text" name="response" id="response" disabled={report.response ? true : false} value={report.response} onInput$={(evt: any) => {
                                 if (!evt.target.value) {
                                   delete state.replies[report._id]
                                   return
                                 }
                                 state.replies[report._id] = evt.target.value;
-                              }}
-                            />
+                              }} class="block w-full border-0 p-0 text-gray-900 disabled:bg-gray-100 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" />
+                            </div>
                           </div>
                         </>
                       )
                     )}
-                    { state.reports.length ? (<button
-                      type="submit"
-                      class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      onClick$={async () => {
-                        const keys = Object.keys(state.replies)
-                        if (!keys.length) return
-                        await ReportApi.reply(state.replies, state.test._id);
-                        state.reports = state.reports.filter((report: any) => !keys.includes(report._id))
-                      }}
-                    >
-                      save
-                    </button> ): 'no reports :)'}
+                    { state.reports.length ? (
+                      <div class="flex justify-center">
+                        <button
+                          type="submit"
+                          class="inline-flex mt-6 w-48 justify-center mx-auto items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          onClick$={async () => {
+                            if (isEmpty(state.replies)) return
+                            await ReportApi.reply(state.replies, state.test._id);
+                            state.reports = state.reports.map((report: any) => {
+                              if(state.replies[report._id])
+                                report['response'] = state.replies[report._id]
+                              return report
+                            })
+                          }}
+                        >
+                          save
+                        </button>
+                      </div>
+                    ): 'no reports :)'}
                   </div>
                 </div>
               </article>

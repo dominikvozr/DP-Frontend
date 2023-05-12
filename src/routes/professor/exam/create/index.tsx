@@ -120,17 +120,19 @@ export default component$(() => {
     return true
   })
 
-  const validateDates = $(() : boolean => {
-    state.dateValidationPrompt = ''
-    if(_.isEmpty(state.startDate))
+  const validateDates = $((submit: boolean = false) : boolean => {
+    if (submit) {
+      state.dateValidationPrompt = ''
+      if(_.isEmpty(state.startDate))
       state.dateValidationPrompt += 'invalid Date 1'
-    if (_.isEmpty(state.startTime))
+      if (_.isEmpty(state.startTime))
       state.dateValidationPrompt += ' invalid Time 1'
-    if (_.isEmpty(state.endDate))
+      if (_.isEmpty(state.endDate))
       state.dateValidationPrompt += ' invalid Date 2'
-    if (_.isEmpty(state.endTime))
+      if (_.isEmpty(state.endTime))
       state.dateValidationPrompt += ' invalid Time 2'
-    if (state.dateValidationPrompt) return true
+      if (state.dateValidationPrompt) return true
+    }
 
     // Concatenate date and time strings and convert to Date objects
     const date1 = new Date(state.startDate + " " + state.startTime);
@@ -252,7 +254,7 @@ export default component$(() => {
                             >
                               <input
                                 type="text"
-                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 placeholder="Select a date"
                                 onInput$={(ev: any) => {
                                   state.startDate = ev.target.value;
@@ -261,7 +263,7 @@ export default component$(() => {
                               />
                               <label
                                 for="floatingInput"
-                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none"
                               >
                                 Select a date
                               </label>
@@ -274,7 +276,7 @@ export default component$(() => {
                             >
                               <input
                                 type="text"
-                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 data-te-toggle="timepicker"
                                 id="form14"
                                 onInput$={(ev: any) => {
@@ -284,7 +286,7 @@ export default component$(() => {
                               />
                               <label
                                 for="form14"
-                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none"
                               >
                                 Select a time
                               </label>
@@ -307,7 +309,7 @@ export default component$(() => {
                             >
                               <input
                                 type="text"
-                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 placeholder="Select a date"
                                 onInput$={(ev: any) => {
                                   state.endDate = ev.target.value;
@@ -316,7 +318,7 @@ export default component$(() => {
                               />
                               <label
                                 for="floatingInput"
-                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none"
                               >
                                 Select a date
                               </label>
@@ -329,7 +331,7 @@ export default component$(() => {
                             >
                               <input
                                 type="text"
-                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
                                 data-te-toggle="timepicker"
                                 onInput$={(ev: any) => {
                                   state.endTime = convertToGMT(ev.target.value);
@@ -339,7 +341,7 @@ export default component$(() => {
                               />
                               <label
                                 for="form14"
-                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none"
                               >
                                 Select a time
                               </label>
@@ -655,6 +657,32 @@ export default component$(() => {
                         </div>
                       </div>
                       <div class="mt-5 md:col-span-2 md:mt-0">
+                        {index === 0 &&
+                          <div class="flex align-middle justify-between space-x-4">
+                              <label for="name" class="block text-sm w-72 font-medium text-gray-700 self-center text-md tracking-wider">
+                                All
+                              </label>
+                              <input
+                                type="number"
+                                step={0.5}
+                                name="name"
+                                id="name"
+                                onInput$={(ev: any) => {
+                                  const num = parseFloat(ev.target.value);
+                                  state.points = 0
+                                  state.tests = state.tests.map((tsts: {testsFile: object, tests: object[]}) => {
+                                    const tts = tsts.tests.map((test: any) => {
+                                      test.points = num
+                                      state.points += num
+                                      return test
+                                    })
+                                    return {testsFile: tsts.testsFile, tests: tts}
+                                  });
+                                }}
+                                class="mt-1 block w-24 flex-end rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                            </div>
+                          }
                         <div class="overflow-hidden shadow sm:rounded-md">
                           <div class="bg-white px-4 py-5 sm:p-6">
                             {testsFile.tests?.map((exam: any, idx: number) => {
@@ -674,6 +702,7 @@ export default component$(() => {
                                     step={0.5}
                                     name="name"
                                     id="name"
+                                    value={state.tests[index].tests[idx].points}
                                     onInput$={(ev: any) => {
                                       state.tests[index].tests[idx].points = parseFloat(
                                         ev.target.value,
@@ -709,7 +738,7 @@ export default component$(() => {
                   disabled={loading.value}
                   onClick$={async () => {
                     state.loading = true;
-                    if ( await validateName() ||  await validateProject() || await validateDates()) {
+                    if ( await validateName() ||  await validateProject() || await validateDates(true)) {
                       window.scrollTo(0, 0);
                       state.loading = false;
                       return
@@ -718,10 +747,12 @@ export default component$(() => {
                     state.loading = false;
                     if (res.status === 200) {
                       state.alert = true;
+                      window.location = `${appUrl}professor` as any
                     }
                     if (res.message === 'success') window.location = `${appUrl}professor` as any;
                   }}
-                  class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  class={`${state.loading ? 'block' : 'hidden'
+                    } inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
                 >
                   Uložiť test
                 </button>
