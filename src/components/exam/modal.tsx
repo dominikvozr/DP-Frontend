@@ -1,9 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { component$, useContext } from '@builder.io/qwik';
+import { component$, useContext, useStore } from '@builder.io/qwik';
 import { ExamModalDataContext } from '~/contexts/contexts';
 
 export const ExamModal = component$(() => {
   const examModalData = useContext(ExamModalDataContext)
+  const state = useStore({
+    startDate: new Date(examModalData.exam.startDate),
+    endDate: new Date(examModalData.exam.endDate),
+  })
 
   return (
     <div class={examModalData.open ? 'block relative z-10 overflow-hidden': 'hidden relative z-10 overflow-hidden'} aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -33,13 +37,13 @@ export const ExamModal = component$(() => {
                     {examModalData.exam.description}
                   </p>
                   <div class="text-sm text-red-500 py-2 border-t-2">
-                    is Open: {examModalData.exam.isOpen.toString()}
+                    is Open: {examModalData.exam.isOpen ? 'Yes' : 'No'}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
-                    Start: {examModalData.exam.startDate.toString()}
+                    Start: {state.startDate.toLocaleDateString()} at {state.startDate.toLocaleTimeString()}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
-                    End: {examModalData.exam.endDate.toString()}
+                    End: {state.endDate.toLocaleDateString()} at {state.endDate.toLocaleTimeString()}
                   </div>
                   <div class="text-sm text-gray-500 py-2 border-t-2">
                     Total points: {examModalData.exam.points}
@@ -66,14 +70,6 @@ export const ExamModal = component$(() => {
                           </>)}
                         </ul>
                       </div>
-
-
-                      {/* <div key={index}>file: {test.testsFile.originalname}</div>
-                      <div class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
-                        {test.tests.map((test) => <>
-                          <div class="" key={test.id}>{test.name} value: {test.points}</div>
-                        </>)}
-                      </div> */}
                     </>)}
                   </div>
                 </div>
