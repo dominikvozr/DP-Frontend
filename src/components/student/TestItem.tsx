@@ -62,16 +62,6 @@ export const TestItem = component$<TestItemProps>((props) => {
       </div>
       {/* Repo meta info */}
       <div class="hidden flex-shrink-0 flex-col items-end space-y-3 sm:flex">
-        <div class="flex items-center space-x-4">
-          <button
-            onClick$={() => {
-              navigator.clipboard.writeText(appUrl + 'student/test/' + props.test.slug);
-            }}
-            class="relative text-sm font-medium text-gray-500 hover:text-gray-900"
-          >
-            Copy join link
-          </button>
-        </div>
         <p class="flex space-x-2 text-sm text-gray-500">
           <span>
             {state.startDate.toLocaleDateString('sk-SK') +

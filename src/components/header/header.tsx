@@ -62,11 +62,6 @@ export const Header = component$(() => {
                   }
                 }}
               >
-                {/*
-								Icon when menu is closed.
-								Heroicon name: outline/bars-3-center-left
-								Menu open: "hidden", Menu closed: "block"
-								*/}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

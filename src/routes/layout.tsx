@@ -26,7 +26,7 @@ export default component$(() => {
   useContextProvider(UserDataContext, state);
   return (
     <>
-      <Header />
+      {state.user && <Header />}
       <Slot />
       <footer class="bg-indigo-50">
         <div class="mx-auto max-w-7xl overflow-hidden py-10 px-6 sm:py-12 lg:px-8">
