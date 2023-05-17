@@ -1,5 +1,5 @@
 import { component$, useStore, useStylesScoped$, useTask$ } from '@builder.io/qwik';
-import { useLocation, useNavigate } from '@builder.io/qwik-city';
+import { useLocation } from '@builder.io/qwik-city';
 import { appUrl } from '~/db/url';
 import { UserApi } from '~/db/UserApi';
 import { Logo } from '../logo/logo';
@@ -7,7 +7,6 @@ import styles from './header.css?inline';
 
 export const Header = component$(() => {
   useStylesScoped$(styles);
-  const nav = useNavigate();
   const loc = useLocation();
   const navigation = [
     { name: 'Professor', href: 'professor' },

@@ -751,7 +751,7 @@ export default component$(() => {
                     }
                     if (res.message === 'success') window.location = `${appUrl}professor` as any;
                   }}
-                  class={`${state.loading ? 'block' : 'hidden'
+                  class={`${state.loading ? 'hidden' : 'block'
                     } inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
                 >
                   Uložiť test

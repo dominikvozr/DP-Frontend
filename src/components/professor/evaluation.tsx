@@ -126,7 +126,7 @@ export const Evaluation = component$<EvaluationProps>((props) => {
           <div key={idx} class="grid grid-cols-4 gap-4 p-4 w-3/4 mx-auto">
             {testFile.tests.map((test: { name: string, classname: string, failure: string, value: number }, index: any) => (
             <div key={index}>
-              <label for={index} class="block relative text-sm font-medium leading-6">
+              <label for={index} class="block relative text-sm font-medium leading-6 truncate">
                 <strong>{index + 1}.</strong> {test.name}
               </label>
               <div class="relative mt-2 rounded-md shadow-sm">
