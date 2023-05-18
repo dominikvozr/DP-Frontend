@@ -786,9 +786,9 @@ export default component$(() => {
                     state.loading = false;
                     if (res.status === 200) {
                       state.alert = true;
-                      // window.location = `${appUrl}professor` as any
+                      window.location = `${appUrl}professor` as any
                     }
-                    // if (res.message === 'success') window.location = `${appUrl}professor` as any;
+                    if (res.message === 'success') window.location = `${appUrl}professor` as any;
                   }}
                   class={`${state.loading ? 'hidden' : 'block'
                     } inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
