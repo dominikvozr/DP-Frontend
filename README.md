@@ -8,6 +8,8 @@
 ![počet súborov](https://img.shields.io/github/directory-file-count/dominikvozr/DP-Frontend?style=plastic)
 ![riadkov kódu](https://img.shields.io/tokei/lines/github/dominikvozr/DP-Frontend?style=plastic)
 ![posledný commit](https://img.shields.io/github/last-commit/dominikvozr/DP-Frontend?label=posledn%C3%BD%20commit&style=plastic)
+![počet jazykov](https://img.shields.io/github/languages/count/dominikvozr/DP-Frontend?color=azure&label=po%C4%8Det%20jazykov&style=plastic)
+![prevažujúci jazyk](https://img.shields.io/github/languages/top/dominikvozr/DP-Frontend?color=white&logo=javascript&style=plastic)
 ---
 # StudentCode Frontend
 ---
