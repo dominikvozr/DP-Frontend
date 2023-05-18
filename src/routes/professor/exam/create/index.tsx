@@ -69,7 +69,20 @@ export default component$(() => {
     projectValidationPrompt: '',
     alert: false,
     loading: false,
+    isJson: false,
   });
+
+  const store = useStore({
+    jsonContent: '',
+    json: ' \
+    [ \
+      { \
+        "id": 1, \
+        "name": "", \
+        "points": 1, \
+      } \
+    ]',
+  })
 
   const loading = useSignal<boolean>(false);
   const recalculatePoints = $(() => {
@@ -441,6 +454,12 @@ export default component$(() => {
                                         ev.target.files,
                                       );
                                       state.tests = data.files;
+                                      for (const file of data.files) {
+                                        const d = file.testsFile.originalname.split('.')
+                                        if( d[1] !== 'java' )
+                                          state.isJson = true
+                                      }
+                                      store.jsonContent = JSON.stringify(data.files)
                                     }}
                                     type="file"
                                     class="sr-only"
@@ -636,7 +655,7 @@ export default component$(() => {
             </div>
           </div>
 
-          {state.tests.length
+          {!state.isJson && state.tests.length
             ? state.tests.map((testsFile: { testsFile: any; tests: any }, index: number) => (
                 <>
                   <div class="hidden sm:block" aria-hidden="true">
@@ -721,15 +740,26 @@ export default component$(() => {
                   </div>
                 </>
               ))
-            : null}
+            : null }
 
+          {state.isJson && state.tests.length ?
+            <div>
+              Tests are unrecognized. System is optimized only for Java Maven projects. Example below is JSON object for one test case. Add as many test cases as you need to "tests" array. Name of each testcase must be valid and included in right testsFile object!
+              <label for="comment" class="block text-sm font-medium leading-6 text-gray-900">JSON - add this example to "tests" array - example = {store.json}</label>
+              <div class="mt-2">
+                <textarea rows={4} name="comment" id="comment" onInput$={(evt: any) => {
+                  store.jsonContent = evt.target.value;
+                }} value={store.jsonContent} class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+              </div>
+            </div>
+          : null}
           <div class="hidden sm:block" aria-hidden="true">
             <div class="py-5">
               <div class="border-t border-gray-200"></div>
             </div>
           </div>
 
-          {state.tests.length ? (
+          { state.isJson || state.tests.length ? (
             <>
               <div class="bg-gray-50 flex flex-col justify-center px-4 py-3 sm:px-6 space-x-6 text-right">
                 <div class="self-center">celkový počet bodov: {state.points}</div>
@@ -743,13 +773,22 @@ export default component$(() => {
                       state.loading = false;
                       return
                     }
+                    if (state.isJson) {
+                      try {
+                        state.tests = JSON.parse(store.jsonContent)
+                      } catch (error) {
+                        console.log('json not valid');
+                        state.loading = false;
+                        return
+                      }
+                    }
                     const res: any = await ExamApi.createExam(state);
                     state.loading = false;
                     if (res.status === 200) {
                       state.alert = true;
-                      window.location = `${appUrl}professor` as any
+                      // window.location = `${appUrl}professor` as any
                     }
-                    if (res.message === 'success') window.location = `${appUrl}professor` as any;
+                    // if (res.message === 'success') window.location = `${appUrl}professor` as any;
                   }}
                   class={`${state.loading ? 'hidden' : 'block'
                     } inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
